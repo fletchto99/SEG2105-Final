@@ -11,6 +11,6 @@ require_once __DIR__ . '/../../bootstrap.php';
 require_once 'entities/Person.php';
 $user = new Person();
 $user->fromJSON();
-$user->checkKeys(['username', 'password']);
+$user->checkKeys(['Username', 'Password', 'First_Name', 'Last_Name']);
 $result = $user->create();
 echo $result->toJSON();

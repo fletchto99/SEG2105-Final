@@ -11,3 +11,8 @@
 
 require_once __DIR__ . '/../../bootstrap.php';
 authenticate();
+$team = new Team();
+$team->fromJSON();
+$team->checkKeys(['Team_Name']);
+$result = $team->create();
+echo $result->toJSON();

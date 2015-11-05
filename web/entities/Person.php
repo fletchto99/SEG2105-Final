@@ -13,6 +13,28 @@ class Person extends Entity {
     private static $user;
 
     /**
+     * Populates a person's entity with the user's info
+     *
+     * @param $personID
+     * @return Person
+     */
+    public static function getUserInfo($personID) {
+        if (!isset($personID)) {
+            ApplicationError('Person', 'PersonID is not defined!');
+        }
+
+        $dbh = Database::getInstance();
+        $sql =
+            "SELECT p.Person_ID, p.First_Name, p.Last_Name, p.Username, p.Jersey_Number, p.Avatar, p.Team_ID r.Role_Name
+             FROM Persons
+                INNER JOIN Roles r ON r.Role_ID = p.Role_Id
+             WHERE p.Person_ID = ?";
+        $sth = $dbh->prepare($sql);
+        $results = $sth->execute([$personID]);
+        return new Person($results);
+    }
+
+    /**
      * Authenticates and retrieve the active user's information
      *
      * @return Person The active user
@@ -23,7 +45,9 @@ class Person extends Entity {
             if (!isset($_SERVER['PHP_AUTH_USER'])) {
                 ApplicationError("Authentication", "Authentication credentials not defined!", 401);
             }
-            $sql = "SELECT * FROM Persons WHERE Username = ? LIMIT 1";
+            $sql = "SELECT Person_ID, Password, Salt
+                    FROM Persons p
+                    WHERE Username = ? LIMIT 1";
             $dbh = Database::getInstance();
             $sth = $dbh->prepare($sql);
             $sth->execute([$_SERVER['PHP_AUTH_USER']]);
@@ -33,7 +57,7 @@ class Person extends Entity {
             } else if ($results['Password'] != hash('sha256', ($_SERVER['PHP_AUTH_PW'] . $results['Salt']))) {
                 ApplicationError("Authentication", "Invalid password.", 401);
             }
-            self::$user = new Person(['Person_ID' => $results['Person_ID'], 'Username' => $results['Username']]);
+            self::$user = self::getUserInfo($results['Person_ID']);
         }
 
         return self::$user;
@@ -51,29 +75,34 @@ class Person extends Entity {
              FROM Persons
              WHERE Username = ?";
         $sth = $dbh->prepare($sql);
-        $sth->execute([$this->username]);
+        $sth->execute([$this->Username]);
 
         if ($sth->fetch()['count'] > 0) {
-            ApplicationError('Authentication', "An account with the username {$this->username} already exists!");
+            ApplicationError('Authentication', "An account with the username {$this->Username} already exists!");
         }
         $salt = bin2hex(openssl_random_pseudo_bytes(32));
-        echo $this->password;
-        echo $salt;
-        $password = hash('sha256', ($this->password . $salt));
-        $sql = "INSERT INTO Persons(Username, Password, Salt)
-                Values(?,?,?)";
+        $password = hash('sha256', ($this->Password . $salt));
+        $sql = "INSERT INTO Persons(Username, Password, Salt, First_Name, Last_Name, Jersey_Number, Role_ID)
+                Values(?,?,?,?,?,?,1)";
         $sth = $dbh->prepare($sql);
-        $sth->execute([$this->username, $password, $salt]);
-        $Person_ID = $dbh->lastInsertId();
-        self::$user = new Person(['Person_ID' => $Person_ID, 'Username' => $this->username]);
+        $sth->execute([$this->Username, $password, $salt, $this->First_Name, $this->Last_Name, (isset($this->Jersey_Number) ? $this->Jersey_Number : null)]);
+        self::$user = self::getUserInfo($dbh->lastInsertId());
         return self::user();
     }
 
-    /**
-     * Check if the person is a player and if so retrieves their player information
-     */
-    public function asPlayer() {
+    public function joinTeam($team) {
+        $user = Person::user();
 
+        if (isset($user->Team_ID) && is_int($user->Team_ID)) {
+            ApplicationError('Team', 'You are already part of a team!');
+        }
+
+        $dbh = Database::getInstance();
+        $sql = "UPDATE Persons
+                SET Team_ID=?
+                WHERE Person_ID=?";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$team, $user->Person_ID]);
     }
 
 }
