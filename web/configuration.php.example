@@ -1,0 +1,9 @@
+<?php
+
+class Configuration {
+    //DB connection information
+    CONST DATABASE_HOST     = 'localhost';
+    CONST DATABASE_NAME     = '<DB_NAME>';
+    CONST DATABASE_USER     = '<DB_USER>';
+    CONST DATABASE_PASSWORD = '<DB_PASSWORD>';
+}
