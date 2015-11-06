@@ -12,24 +12,6 @@ class Person extends Entity {
 
     private static $user;
 
-    /**
-     * Populates a person's entity with the user's info
-     *
-     * @param $personID
-     * @return Person
-     */
-    public static function getUserInfo($personID) {
-        if (!isset($personID)) {
-            ApplicationError('Person', 'PersonID is not defined!');
-        }
-
-        $person = new Person();
-        $person->Person_ID = $personID;
-        $person->populate();
-        return $person;
-    }
-
-
     private function populate() {
         if (!isset($this->Person_ID)) {
             ApplicationError('Person', 'Person_ID is not defined!');
@@ -47,6 +29,23 @@ class Person extends Entity {
             ApplicationError("Person", "No person found with the id: {$this->Person_ID}");
         }
         $this->data = $results;
+    }
+
+    /**
+     * Populates a person's entity with the user's info
+     *
+     * @param $personID
+     * @return Person
+     */
+    public static function getPerson($personID) {
+        if (!isset($personID)) {
+            ApplicationError('Person', 'PersonID is not defined!');
+        }
+
+        $person = new Person();
+        $person->Person_ID = $personID;
+        $person->populate();
+        return $person;
     }
 
     /**
@@ -72,7 +71,7 @@ class Person extends Entity {
             } else if ($results['Password'] != hash('sha256', ($_SERVER['PHP_AUTH_PW'] . $results['Salt']))) {
                 ApplicationError("Authentication", "Invalid password.", 401);
             }
-            self::$user = self::getUserInfo($results['Person_ID']);
+            self::$user = self::getPerson($results['Person_ID']);
         }
 
         return self::$user;
@@ -101,7 +100,7 @@ class Person extends Entity {
                 Values(?,?,?,?,?,?,1)";
         $sth = $dbh->prepare($sql);
         $sth->execute([$this->Username, $password, $salt, $this->First_Name, $this->Last_Name, (isset($this->Jersey_Number) ? $this->Jersey_Number : null)]);
-        self::$user = self::getUserInfo($dbh->lastInsertId());
+        self::$user = self::getPerson($dbh->lastInsertId());
         return self::user();
     }
 

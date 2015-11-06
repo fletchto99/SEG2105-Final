@@ -12,7 +12,7 @@ class Team extends Entity {
 
     private function populate() {
         if (!isset($this->Team_ID)) {
-            ApplicationError('Person', 'PersonID is not defined!');
+            ApplicationError('Team', 'Team_ID is not defined!');
         }
 
         $dbh = Database::getInstance();
@@ -28,9 +28,9 @@ class Team extends Entity {
         $this->data = $results;
     }
 
-    public static function getTeamInfo($teamID) {
+    public static function getTeam($teamID) {
         if (!isset($teamID)) {
-            ApplicationError('Team', 'Team_ID is not defined!');
+            ApplicationError('Team', 'teamID is not defined!');
         }
 
         $team = new Team();
@@ -64,7 +64,6 @@ class Team extends Entity {
 
     public function updateName($Team_Name) {
         $user = Person::user();
-        $this->populate();
         if ($user->Person_ID != $this->Captain_ID || !$user->hasRole('Organizer')) {
             ApplicationError("Team", "You must be the team captain or an event organizer to rename a team!");
         }

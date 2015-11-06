@@ -8,7 +8,7 @@ class Tournament extends Entity {
 
     private function populate() {
         if (!isset($this->Tournament_ID)) {
-            ApplicationError('Tournament', 'Tournamnet_ID is not defined!');
+            ApplicationError('Tournament', 'Tournament_ID is not defined!');
         }
 
         $dbh = Database::getInstance();
@@ -24,7 +24,7 @@ class Tournament extends Entity {
         $this->data = $results;
     }
 
-    public static function getTournamentInfo($tournamentID) {
+    public static function getTournament($tournamentID) {
         if (!isset($tournamentID)) {
             ApplicationError('Tournament', 'Tournament_ID is not defined!');
         }
@@ -56,7 +56,7 @@ class Tournament extends Entity {
                 Values(?,?)";
         $sth = $dbh->prepare($sql);
         $sth->execute([$this->Tournamnet_Name, $user->Person_ID]);
-        return self::getTournamentInfo($dbh->lastInsertId());
+        return self::getTournament($dbh->lastInsertId());
     }
 
     /**
@@ -83,6 +83,28 @@ class Tournament extends Entity {
         $sth->execute([$this->Tournament_ID, $team->Team_ID]);
 
         return new Entity(['Success' => 'Your team has joined the tournament.']);
+    }
+
+    public function end() {
+        $user = Person::user();
+        if (!$user->hasRole('Organizer')) {
+            ApplicationError("Tournament", "You are not a tournament organizer!");
+        }
+        if ($this->Status != 1) {
+            ApplicationError("Tournament", "The tournament is not in progress!");
+        }
+
+        $sql = "SELECT count(*) as count
+                FROM Matches
+                WHERE Tournament_ID = ?
+                  AND Status <> 2";
+
+        $dbh = Database::getInstance();
+        $sth = $dbh->prepare($sql);
+        $result = $sth->execute([$this->Tournament_ID]);
+        if (intval($result['count']) > 0) {
+            ApplicationError("Tournament", "All matches must be complete before the tournament can end!");
+        }
     }
 
 

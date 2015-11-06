@@ -14,6 +14,6 @@ authenticate();
 $input = new Entity();
 $input->fromJSON();
 $input->checkKeys(['Team_ID', 'Team_Name']);
-$team = Team::getTeamInfo($input->Team_ID);
+$team = Team::getTeam($input->Team_ID);
 $result = $team->updateName($input->Team_Name);
 echo $result->toJSON();
