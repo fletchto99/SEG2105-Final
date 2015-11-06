@@ -121,4 +121,17 @@ class Person extends Entity {
         return intval($results['count']) > 0;
     }
 
+    public function updateJerseyNumber($number) {
+        if (!$this->hasRole('Player')) {
+            ApplicationError("Player", "You must be a player to have a jersey number!");
+        }
+        $sql = "UPDATE Persons
+                SET Jersey_Number=?
+                WHERE Person_ID=?";
+        $dbh = Database::getInstance();
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$number, $this->Person_ID]);
+        return new Entity(['Success'=>"Player number changed to {$number}"]);
+    }
+
 }
