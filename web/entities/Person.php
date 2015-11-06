@@ -23,6 +23,18 @@ class Person extends Entity {
             ApplicationError('Person', 'PersonID is not defined!');
         }
 
+        $person = new Person();
+        $person->Person_ID = $personID;
+        $person->populate();
+        return $person;
+    }
+
+
+    private function populate() {
+        if (!isset($this->Person_ID)) {
+            ApplicationError('Person', 'Person_ID is not defined!');
+        }
+
         $dbh = Database::getInstance();
         $sql =
             "SELECT p.Person_ID, p.First_Name, p.Last_Name, p.Username, p.Jersey_Number, p.Avatar, p.Team_ID r.Role_Name
@@ -30,11 +42,11 @@ class Person extends Entity {
                 INNER JOIN Roles r ON r.Role_ID = p.Role_Id
              WHERE p.Person_ID = ?";
         $sth = $dbh->prepare($sql);
-        $results = $sth->execute([$personID]);
+        $results = $sth->execute([$this->Person_ID]);
         if (!$results) {
-            ApplicationError("Person", "No person found with the id: {$personID}");
+            ApplicationError("Person", "No person found with the id: {$this->Person_ID}");
         }
-        return new Person($results);
+        $this->data = $results;
     }
 
     /**

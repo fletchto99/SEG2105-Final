@@ -6,6 +6,40 @@ require_once 'lib/Entity.php';
 
 class Tournament extends Entity {
 
+    private function populate() {
+        if (!isset($this->Tournament_ID)) {
+            ApplicationError('Tournament', 'Tournamnet_ID is not defined!');
+        }
+
+        $dbh = Database::getInstance();
+        $sql =
+            "SELECT *
+            FROM Tournaments
+            WHERE Tournament_ID=?";
+        $sth = $dbh->prepare($sql);
+        $results = $sth->execute([$this->Tournament_ID]);
+        if (!$results) {
+            ApplicationError("Tournament", "No tournament found with the id: {$this->Tournament_ID}");
+        }
+        $this->data = $results;
+    }
+
+    public static function getTournamentInfo($tournamentID) {
+        if (!isset($tournamentID)) {
+            ApplicationError('Tournament', 'Tournament_ID is not defined!');
+        }
+
+        $tournament = new Tournament();
+        $tournament->Tournament_ID = $tournamentID;
+        $tournament->populate();
+        return $tournament;
+    }
+
+    /**
+     * Creates a tournament
+     *
+     * @return Entity
+     */
     public function create() {
         $user = Person::user();
 
@@ -22,10 +56,15 @@ class Tournament extends Entity {
                 Values(?,?)";
         $sth = $dbh->prepare($sql);
         $sth->execute([$this->Tournamnet_Name, $user->Person_ID]);
-
-        return new Entity(['success'=>'Team successfully created!']);
+        return self::getTournamentInfo($dbh->lastInsertId());
     }
 
+    /**
+     * Adds a team to the tournament
+     *
+     * @param $team
+     * @return Entity
+     */
     public function addTeam($team) {
         $user = Person::user();
 

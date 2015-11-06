@@ -10,8 +10,8 @@ require_once 'lib/Entity.php';
  */
 class Team extends Entity {
 
-    public static function getTeamInfo($teamID) {
-        if (!isset($personID)) {
+    private function populate() {
+        if (!isset($this->Team_ID)) {
             ApplicationError('Person', 'PersonID is not defined!');
         }
 
@@ -21,11 +21,22 @@ class Team extends Entity {
             FROM Teams
             WHERE Team_ID=?";
         $sth = $dbh->prepare($sql);
-        $results = $sth->execute([$teamID]);
+        $results = $sth->execute([$this->Team_ID]);
         if (!$results) {
-            ApplicationError("Team", "No team found with the id: {$teamID}");
+            ApplicationError("Team", "No team found with the id: {$this->Team_ID}");
         }
-        return new Team($results);
+        $this->data = $results;
+    }
+
+    public static function getTeamInfo($teamID) {
+        if (!isset($teamID)) {
+            ApplicationError('Team', 'Team_ID is not defined!');
+        }
+
+        $team = new Team();
+        $team->Team_ID = $teamID;
+        $team->populate();
+        return $team;
     }
 
     public function create() {
@@ -51,8 +62,19 @@ class Team extends Entity {
 
     }
 
-    public function updateName() {
-
+    public function updateName($Team_Name) {
+        $user = Person::user();
+        $this->populate();
+        if ($user->Person_ID != $this->Captain_ID || !$user->hasRole('Organizer')) {
+            ApplicationError("Team", "You must be the team captain or an event organizer to rename a team!");
+        }
+        $sql = "UPDATE Teams
+                SET Team_Name=?
+                WHERE Team_ID=?";
+        $dbh = Database::getInstance();
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$Team_Name, $this->Team_ID]);
+        return new Entity(['success'=>"Team name updated to {$this->Team_Name}"]);
     }
 
 }

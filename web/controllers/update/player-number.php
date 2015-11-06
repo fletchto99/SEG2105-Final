@@ -15,4 +15,5 @@ $input = new Entity();
 $input->fromJSON();
 $input->checkKeys(['Jersey_Number']);
 $user = Person::user();
-$user->updateJerseyNumber($input->Jersey_Number);
+$result = $user->updateJerseyNumber($input->Jersey_Number);
+echo $result->toJSON();

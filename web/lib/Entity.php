@@ -13,7 +13,7 @@ class Entity implements JsonSerializable {
     /*
      * An associative array containing all of the data of the entity
      */
-    private $data;
+    protected $data;
 
     public function __construct($data = []) {
         $this->data = $data;
