@@ -10,6 +10,24 @@ require_once 'lib/Entity.php';
  */
 class Team extends Entity {
 
+    public static function getTeamInfo($teamID) {
+        if (!isset($personID)) {
+            ApplicationError('Person', 'PersonID is not defined!');
+        }
+
+        $dbh = Database::getInstance();
+        $sql =
+            "SELECT *
+            FROM Teams
+            WHERE Team_ID=?";
+        $sth = $dbh->prepare($sql);
+        $results = $sth->execute([$teamID]);
+        if (!$results) {
+            ApplicationError("Team", "No team found with the id: {$teamID}");
+        }
+        return new Team($results);
+    }
+
     public function create() {
         $user = Person::user();
 

@@ -31,6 +31,9 @@ class Person extends Entity {
              WHERE p.Person_ID = ?";
         $sth = $dbh->prepare($sql);
         $results = $sth->execute([$personID]);
+        if (!$results) {
+            ApplicationError("Person", "No person found with the id: {$personID}");
+        }
         return new Person($results);
     }
 
@@ -103,6 +106,19 @@ class Person extends Entity {
                 WHERE Person_ID=?";
         $sth = $dbh->prepare($sql);
         $sth->execute([$team, $user->Person_ID]);
+    }
+
+    public function hasRole($role) {
+        $sql = "SELECT count(p.Person_ID) as count
+                FROM Persons p
+                    INNER JOIN Roles r ON r.Role_ID = p.Role_ID
+                WHERE p.Person_ID = ?
+                  AND r.Role_Name = ?";
+        $dbh = Database::getInstance();
+
+        $sth = $dbh ->prepare($sql);
+        $results = $sth->execute([$this->Person_ID, $role]);
+        return intval($results['count']) > 0;
     }
 
 }
