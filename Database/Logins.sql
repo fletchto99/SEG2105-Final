@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS `Logins` (
   `Last_Update_Date_Time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`Login_ID`),
   UNIQUE KEY `Username` (`Username`),
+  UNIQUE KEY `Person_ID_UQ` (`Person_ID`),
   KEY `Person_ID` (`Person_ID`),
   CONSTRAINT `Logins_ibfk` FOREIGN KEY (`Person_ID`) REFERENCES `PErsons` (`Person_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

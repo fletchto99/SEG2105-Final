@@ -15,6 +15,9 @@ set_include_path(get_include_path() . PATH_SEPARATOR . APP_ROOT);
 
 require_once 'configuration.php';
 require_once 'entities/Person.php';
+require_once 'entities/Match.php';
+require_once 'entities/Team.php';
+require_once 'entities/Tournament.php';
 
 /**
  * Sends an error message to the client

@@ -17,7 +17,8 @@ class Tournament extends Entity {
             FROM Tournaments
             WHERE Tournament_ID=?";
         $sth = $dbh->prepare($sql);
-        $results = $sth->execute([$this->Tournament_ID]);
+        $sth->execute([$this->Tournament_ID]);
+        $results = $sth->fetchAll();
         if (!$results) {
             ApplicationError("Tournament", "No tournament found with the id: {$this->Tournament_ID}");
         }
@@ -103,7 +104,8 @@ class Tournament extends Entity {
 
         $dbh = Database::getInstance();
         $sth = $dbh->prepare($sql);
-        $result = $sth->execute([$this->Tournament_ID]);
+        $sth->execute([$this->Tournament_ID]);
+        $result = $sth->fetch();
         if (intval($result['count']) > 0) {
             ApplicationError("Tournament", "All matches must be complete before the tournament can end!");
         }
@@ -142,6 +144,39 @@ class Tournament extends Entity {
             ApplicationError("Tournament", "A tournament must be in the planning phase to be started!");
         }
         //TODO: Complete!
+    }
+
+    public function getMatches() {
+        $matches = new Entity();
+        $dbh = Database::getInstance();
+        $sql = "SELECT Match_ID
+                FROM Matches
+                WHERE Tournament_ID = ?
+                AND Status = 0";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$this->Tournament_ID]);
+        $results = $sth->fetchAll(PDO::FETCH_COLUMN, 0);
+        $matches->addToData(['pregame'=>$results]);
+
+        $sql = "SELECT Match_ID
+                FROM Matches
+                WHERE Tournament_ID = ?
+                AND Status = 1";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$this->Tournament_ID]);
+        $results = $sth->fetchAll(PDO::FETCH_COLUMN, 0);
+        $matches->addToData(['inprogress' => $results]);
+
+        $sql = "SELECT Match_ID
+                FROM Matches
+                WHERE Tournament_ID = ?
+                AND Status = 2";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$this->Tournament_ID]);
+        $results = $sth->fetchAll(PDO::FETCH_COLUMN, 0);
+        $matches->addToData(['end' => $results]);
+
+        return $matches;
     }
 
 }

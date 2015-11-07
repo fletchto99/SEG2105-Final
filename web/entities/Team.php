@@ -21,7 +21,8 @@ class Team extends Entity {
             FROM Teams
             WHERE Team_ID=?";
         $sth = $dbh->prepare($sql);
-        $results = $sth->execute([$this->Team_ID]);
+        $sth->execute([$this->Team_ID]);
+        $results = $sth->fetchAll();
         if (!$results) {
             ApplicationError("Team", "No team found with the id: {$this->Team_ID}");
         }
@@ -102,6 +103,16 @@ class Team extends Entity {
             $sth = $dbh->prepare($sql);
             return $sth->execute();
         }
+    }
+
+    public function matchesWon() {
+        //TODO: implement
+        return 0;
+    }
+
+    public function matchesLost() {
+        //TODO: implement
+        return 0;
     }
 
 }

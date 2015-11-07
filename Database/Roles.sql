@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `Roles` (
   UNIQUE KEY `Role_Name` (`Role_Name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
--- Dumping data for table mlanglois_SEG2105_Final.Roles: ~0 rows (approximately)
+-- Dumping data for table mlanglois_SEG2105_Final.Roles: ~2 rows (approximately)
 /*!40000 ALTER TABLE `Roles` DISABLE KEYS */;
 INSERT INTO `Roles` (`Role_ID`, `Role_Name`, `Role_Description`, `Last_Update_Datetime`) VALUES
 	(1, 'Organizer', 'Organizes tournaments', '2015-11-07 14:54:36'),

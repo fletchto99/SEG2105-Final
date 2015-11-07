@@ -17,7 +17,8 @@ class Match extends Entity {
             FROM Matches
             WHERE Match_ID=?";
         $sth = $dbh->prepare($sql);
-        $results = $sth->execute([$this->Match_ID]);
+        $sth->execute([$this->Match_ID]);
+        $results = $sth->fetchAll();
         if (!$results) {
             ApplicationError("Match", "No match found with the id: {$this->Match_ID}");
         }
@@ -43,13 +44,13 @@ class Match extends Entity {
         if ($this->Status != 1) {
             ApplicationError("Match", "A match must be in progress to add goals!");
         }
-        $sql = "INSERT INTO Goals(Match_ID, Player_ID, Assist_ID)
-                VALUES (?,?,?)";
+        $sql = "INSERT INTO Goals(Match_ID, Player_ID, Assist_ID, Team_ID)
+                VALUES (?,?,?,?)";
         $dbh = Database::getInstance();
         $sth = $dbh->prepare($sql);
 
         $assist_ID = $assister != null ? $assister->Person_ID : null;
-        $sth->execute([$this->Match_ID, $player->Person_ID, $assist_ID]);
+        $sth->execute([$this->Match_ID, $player->Person_ID, $assist_ID, $player->Team_ID]);
     }
 
     public function begin() {
@@ -86,6 +87,20 @@ class Match extends Entity {
         }
 
         $dbh = Database::getInstance();
+        $sql = "SELECT count(*) as count
+                FROM Goals
+                WHERE Match_ID = ?
+                AND Team_ID = ?";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$this->Match_ID, $this->Team_A_ID]);
+        $goals_A = $sth->fetch();
+        $sth->execute([$this->Match_ID, $this->Team_B_ID]);
+        $goals_B = $sth->fetch();
+
+        if ($goals_A['count'] == $goals_B['count']) {
+            ApplicationError('Match', "The match can't end in a tie! This is a tournament!");
+        }
+
         $sql = "UPDATE Matches
                 SET Status = 2
                 WHERE Match_ID = ?";

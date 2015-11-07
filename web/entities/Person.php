@@ -24,7 +24,8 @@ class Person extends Entity {
                 INNER JOIN Roles r ON r.Role_ID = p.Role_Id
              WHERE p.Person_ID = ?";
         $sth = $dbh->prepare($sql);
-        $results = $sth->execute([$this->Person_ID]);
+        $sth->execute([$this->Person_ID]);
+        $results = $sth->fetchAll();
         if (!$results) {
             ApplicationError("Person", "No person found with the id: {$this->Person_ID}");
         }
@@ -150,7 +151,8 @@ class Person extends Entity {
                 FROM Persons
                 WHERE Team_ID = ?";
         $sth = $dbh->prepare($sql);
-        $results = $sth->execute([$team->Team_ID]);
+        $sth->execute([$team->Team_ID]);
+        $results = $sth->fetch();
         if (intval($results['count']) >= Configuration::MAX_TEAM_SIZE) {
             ApplicationError('Team', 'Sorry, this team is full!');
         }
@@ -173,7 +175,8 @@ class Person extends Entity {
         $dbh = Database::getInstance();
 
         $sth = $dbh ->prepare($sql);
-        $results = $sth->execute([$this->Person_ID, $role]);
+        $sth->execute([$this->Person_ID, $role]);
+        $results = $sth->fetch();
         return intval($results['count']) > 0;
     }
 
@@ -215,15 +218,46 @@ class Person extends Entity {
                     SET Team_ID = null
                     WHERE Team_ID = ?";
             $sth = $dbh->prepare($sql);
-            $sth->execute($this->Team_ID);
+            $sth->execute([$this->Team_ID]);
         } else {
             $sql = "UPDATE Persons
                     SET Team_ID = null
                     WHERE Person_ID = ?";
             $sth = $dbh->prepare($sql);
-            $sth->execute($this->Person_ID);
+            $sth->execute([$this->Person_ID]);
         }
         $this->Team_ID = null;
+    }
+
+    public function statistics() {
+        $dbh = Database::getInstance();
+        $sql = "SELECT Count(*) as count
+                FROM Goals
+                WHERE Player_ID = ?";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$this->Person_ID]);
+        $results = $sth->fetch();
+        $this->addToData(['Goals_Scored'=>$results['count']]);
+
+        $sql = "SELECT Count(*) as count
+                FROM Goals
+                WHERE Assist_ID = ?";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$this->Person_ID]);
+        $results = $sth->fetch();
+        $this->addToData(['Assists' => $results['count']]);
+
+        //TODO: Flaw exists here as it only calculates for the current team. Our data structure currently would not support looking up matches won with other teams
+        if (isset($this->Team_ID) && is_int($this->Team_ID)) {
+            $team = Team::getTeam($this->Team_ID);
+            $this->addToData(['Matches_With_Team' => ['Won' => $team->matchesWon(), 'Lost' => $team->matchesLost()]]);
+            $this->addToData(['Active_Tournaments' => $team->getTournaments(1)]);
+        } else {
+            $this->addToData(['Matches_With_Team' => ['Won' => 0, 'Lost' => 0]]);
+            $this->addToData(['Active_Tournaments' => []]);
+        }
+
+        return $this;
     }
 
 }
