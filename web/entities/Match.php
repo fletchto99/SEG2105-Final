@@ -52,4 +52,47 @@ class Match extends Entity {
         $sth->execute([$this->Match_ID, $player->Person_ID, $assist_ID]);
     }
 
+    public function begin() {
+        $user = Person::user();
+        if (!$user->hasRole('Organizer')) {
+            ApplicationError("Match", "You must be a tournament organizer to begin a match!");
+        }
+        $tournament = Tournament::getTournament($this->Tournament_ID);
+
+        if ($tournament->Status != 1) {
+            ApplicationError("Match", "A tournament must be in progress before a match can begin!");
+        }
+
+        if ($this->Status != 0) {
+            ApplicationError("Match", "A match must be in the pre-game phase to be started!");
+        }
+
+        $dbh = Database::getInstance();
+        $sql = "UPDATE Matches
+                SET Status = 1
+                WHERE Match_ID = ?";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$this->Match_ID]);
+        return new Entity(['success' => 'Match started!']);
+    }
+
+    public function end() {
+        $user = Person::user();
+        if (!$user->hasRole('Organizer')) {
+            ApplicationError("Match", "You must be a tournament organizer to begin a match!");
+        }
+        if ($this->Status != 1) {
+            ApplicationError("Match", "A match must be in-progress to be finalized!");
+        }
+
+        $dbh = Database::getInstance();
+        $sql = "UPDATE Matches
+                SET Status = 2
+                WHERE Match_ID = ?";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$this->Match_ID]);
+
+        return new Entity(['success' => 'Match ended!']);
+    }
+
 }

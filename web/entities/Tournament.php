@@ -68,10 +68,12 @@ class Tournament extends Entity {
     public function addTeam($team) {
         $user = Person::user();
 
-        if ($team->Captain_ID != $user->Person_ID) {
+        if ($team->Captain_ID != $user->Person_ID && !$user->hasRole('Organizer')) {
             ApplicationError("Team", "You must be the team captain to join a tournament!");
         }
-
+        if ($this->Deleted == 1) {
+            ApplicationError("Tournament", "The tournament has been canceled! Unable to join.");
+        }
         if ($this->Status != 0) {
             ApplicationError("Tournament", "The tournament has already begun! Unable to join.");
         }
@@ -105,7 +107,41 @@ class Tournament extends Entity {
         if (intval($result['count']) > 0) {
             ApplicationError("Tournament", "All matches must be complete before the tournament can end!");
         }
+
+        $sql = "UPDATE Tournaments
+                SET Status = 2
+                WHERE Tournament_ID = ?";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$this->Tournament_ID]);
+        return new Entity(['success'=>'Tournament successfully ended!']);
     }
 
+    public function delete() {
+        $user = Person::user();
+        if (!$user->hasRole('Organizer')) {
+            ApplicationError("Permissions", "You must be an organizer to delete a tournament!");
+        }
+        if ($this->Status != 0) {
+            ApplicationError("Tournament", "A tournament must be in the planning phase to be deleted!");
+        }
+
+        $dbh = Database::getInstance();
+        $sql = "UPDATE Tournaments
+                SET Deleted = 1
+                WHERE Tournament_ID = ?";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$this->Tournament_ID]);
+    }
+
+    public function begin($Tournament_Type) {
+        $user = Person::user();
+        if (!$user->hasRole('Organizer')) {
+            ApplicationError("Permissions", "You must be an organizer to start a tournament!");
+        }
+        if ($this->Status != 0) {
+            ApplicationError("Tournament", "A tournament must be in the planning phase to be started!");
+        }
+        //TODO: Complete!
+    }
 
 }

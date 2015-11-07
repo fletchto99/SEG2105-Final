@@ -1,9 +1,15 @@
 <?php
 
+/**
+ *  Author(s)   :  Matt Langlois
+ *  Details     :  This contains all of the application's configuration settings
+ */
 class Configuration {
     //DB connection information
     CONST DATABASE_HOST     = 'localhost';
     CONST DATABASE_NAME     = '<DB_NAME>';
     CONST DATABASE_USER     = '<DB_USER>';
     CONST DATABASE_PASSWORD = '<DB_PASSWORD>';
+
+    CONST MAX_TEAM_SIZE     = 20;
 }

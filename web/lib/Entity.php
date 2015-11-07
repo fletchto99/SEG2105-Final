@@ -1,7 +1,7 @@
 <?php
 /**
  *  Details     :  A class to manage database interactions and data I/O
- *  Author(s)   :  Matt Langlois, Will Thompson, Kurt Bruneau
+ *  Author(s)   :  Will Thompson, Kurt Bruneau, Matt Langlois
  *
  */
 

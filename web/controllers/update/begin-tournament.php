@@ -11,3 +11,8 @@
 
 require_once __DIR__ . '/../../bootstrap.php';
 authenticate();
+$input = new Entity();
+$input->fromJSON();
+$input->checkKeys(['Tournament_ID', 'Tournament_Type']);
+$tournament = Tournament::getTournament($input->Tournament_ID);
+$tournament->begin($input->Tournament_Type);

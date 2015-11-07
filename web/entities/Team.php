@@ -53,7 +53,7 @@ class Team extends Entity {
         $sth->execute([$this->Team_Name]);
 
         $teamID = $dbh->lastInsertId();
-        $user->joinTeam($teamID);
+        $user->joinTeam(self::getTeam($teamID));
 
         return new Entity(['success'=>'Team successfully created!']);
     }
@@ -74,6 +74,24 @@ class Team extends Entity {
         $sth = $dbh->prepare($sql);
         $sth->execute([$Team_Name, $this->Team_ID]);
         return new Entity(['success'=>"Team name updated to {$this->Team_Name}"]);
+    }
+
+    public function getTournaments($status = null) {
+        $dbh = Database::getInstance();
+        $sql = "SELECT *
+                FROM Tournaments t
+                    INNER JOIN TournamentTeams tt ON tt.Team_ID = t.Team_ID
+                WHERE
+                    t.Deleted = 0 AND
+                    tt.Deleted = 0";
+        if ($status != null) {
+            $sql .= "AND t.Status = ?";
+            $sth = $dbh->prepare($sql);
+            return $sth->execute([$status]);
+        } else {
+            $sth = $dbh->prepare($sql);
+            return $sth->execute();
+        }
     }
 
 }

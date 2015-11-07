@@ -112,11 +112,21 @@ class Person extends Entity {
         }
 
         $dbh = Database::getInstance();
+        $sql = "SELECT Count(*) as count
+                FROM Persons
+                WHERE Team_ID = ?";
+        $sth = $dbh->prepare($sql);
+        $results = $sth->execute([$team->Team_ID]);
+        if (intval($results['count']) >= Configuration::MAX_TEAM_SIZE) {
+            ApplicationError('Team', 'Sorry, this team is full!');
+        }
+
         $sql = "UPDATE Persons
                 SET Team_ID=?
                 WHERE Person_ID=?";
         $sth = $dbh->prepare($sql);
-        $sth->execute([$team, $user->Person_ID]);
+        $sth->execute([$team->Team_ID, $user->Person_ID]);
+        $this->Team_ID = $team->Team_ID;
     }
 
     public function hasRole($role) {
@@ -142,7 +152,43 @@ class Person extends Entity {
         $dbh = Database::getInstance();
         $sth = $dbh->prepare($sql);
         $sth->execute([$number, $this->Person_ID]);
+        $this->Jersey_Number = $number;
         return new Entity(['Success'=>"Player number changed to {$number}"]);
+    }
+
+    public function leaveTeam() {
+        if (!$this->hasRole('Player')) {
+            ApplicationError("Permission", "You must be a player to leave a team!");
+        }
+        if (isset($this->Team_ID)) {
+            ApplicationError("Team", "You must be part of a team before you can leave it.");
+        }
+        $team = Team::getTeam($this->Team_ID);
+        $tournaments = $team->getTournaments(1);
+        if (sizeof($tournaments) > 0) {
+            ApplicationError("Team", "Your team is currently in an active tournament! Please wait for the tournament to finish before leaving.");
+        }
+        $dbh = Database::getInstance();
+        if ($team->Captain_ID==$this->Person_ID) {
+            $sql = "UPDATE Teams
+                    SET Captain_ID = null,
+                        Deleted = 1
+                    WHERE Team_ID = ?";
+            $sth = $dbh->prepare($sql);
+            $sth->execute([$this->Team_ID]);
+            $sql = "UPDATE Persons
+                    SET Team_ID = null
+                    WHERE Team_ID = ?";
+            $sth = $dbh->prepare($sql);
+            $sth->execute($this->Team_ID);
+        } else {
+            $sql = "UPDATE Persons
+                    SET Team_ID = null
+                    WHERE Person_ID = ?";
+            $sth = $dbh->prepare($sql);
+            $sth->execute($this->Person_ID);
+        }
+        $this->Team_ID = null;
     }
 
 }

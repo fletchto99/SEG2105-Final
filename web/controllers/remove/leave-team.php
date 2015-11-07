@@ -7,3 +7,5 @@
 
 require_once __DIR__ . '/../../bootstrap.php';
 authenticate();
+$person = Person::user();
+$person->leaveTeam();
