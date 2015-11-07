@@ -18,9 +18,14 @@ CREATE TABLE IF NOT EXISTS `Roles` (
   `Last_Update_Datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`Role_ID`),
   UNIQUE KEY `Role_Name` (`Role_Name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
--- Data exporting was unselected.
+-- Dumping data for table mlanglois_SEG2105_Final.Roles: ~0 rows (approximately)
+/*!40000 ALTER TABLE `Roles` DISABLE KEYS */;
+INSERT INTO `Roles` (`Role_ID`, `Role_Name`, `Role_Description`, `Last_Update_Datetime`) VALUES
+	(1, 'Organizer', 'Organizes tournaments', '2015-11-07 14:54:36'),
+	(2, 'Player', 'Participates in tournaments', '2015-11-07 14:54:55');
+/*!40000 ALTER TABLE `Roles` ENABLE KEYS */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

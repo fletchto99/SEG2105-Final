@@ -60,7 +60,7 @@ class Person extends Entity {
                 ApplicationError("Authentication", "Authentication credentials not defined!", 401);
             }
             $sql = "SELECT Person_ID, Password, Salt
-                    FROM Persons p
+                    FROM Logins
                     WHERE Username = ? LIMIT 1";
             $dbh = Database::getInstance();
             $sth = $dbh->prepare($sql);
@@ -72,6 +72,9 @@ class Person extends Entity {
                 ApplicationError("Authentication", "Invalid password.", 401);
             }
             self::$user = self::getPerson($results['Person_ID']);
+        } else {
+            //Repopulate the entity to reflect any changes to the user
+            self::$user = self::getPerson(self::$user->Person_ID);
         }
 
         return self::$user;
@@ -80,27 +83,58 @@ class Person extends Entity {
     /**
      * Attempts to create a user with the username and password specified in the entity
      *
+     * @param $mode Integer The creation mode, 0 for normal, 1 for only player, 2 for organizer
+     *
      * @return Person The active session for the user which was created
      */
-    public function create() {
+    public function create($personOnly = false) {
         $dbh = Database::getInstance();
-        $sql =
-            "SELECT COUNT(*) as count
-             FROM Persons
-             WHERE Username = ?";
-        $sth = $dbh->prepare($sql);
-        $sth->execute([$this->Username]);
 
-        if ($sth->fetch()['count'] > 0) {
-            ApplicationError('Authentication', "An account with the username {$this->Username} already exists!");
+        if (!$personOnly) {
+            $sql =
+                "SELECT COUNT(*) as count
+             FROM Logins
+             WHERE Username = ?";
+            $sth = $dbh->prepare($sql);
+            $sth->execute([$this->Username]);
+
+            if ($sth->fetch()['count'] > 0) {
+                ApplicationError('Authentication', "An account with the username {$this->Username} already exists!");
+            }
+        } else {
+            $user = Person::user();
+            if (!$user->hasRole('Organizer')) {
+                ApplicationError('Permission', "You must be an organizer to create a player only!");
+            }
         }
-        $salt = bin2hex(openssl_random_pseudo_bytes(32));
-        $password = hash('sha256', ($this->Password . $salt));
-        $sql = "INSERT INTO Persons(Username, Password, Salt, First_Name, Last_Name, Jersey_Number, Role_ID)
-                Values(?,?,?,?,?,?,1)";
+
+        if (isset($this->Role_ID)) {
+            $user = Person::user();
+            if (!$user->hasRole('Organizer')) {
+                ApplicationError('Permission', "You must be an organizer to create an account with a specific role!");
+            }
+        }
+
+        $sql = "INSERT INTO Persons(First_Name, Last_Name, Jersey_Number, Role_ID)
+                VALUES (?,?,?,?)";
         $sth = $dbh->prepare($sql);
-        $sth->execute([$this->Username, $password, $salt, $this->First_Name, $this->Last_Name, (isset($this->Jersey_Number) ? $this->Jersey_Number : null)]);
-        self::$user = self::getPerson($dbh->lastInsertId());
+
+        $jerseyNumber = (isset($this->Jersey_Number) ? $this->Jersey_Number : null);
+        $roleID = (isset($this->Role_ID) ? $this->Role_ID : 2);
+
+        $sth->execute([$this->First_Name, $this->Last_Name, $jerseyNumber, $roleID]);
+        $pid = $dbh->lastInsertId();
+
+        if (!$personOnly) {
+            $salt = bin2hex(openssl_random_pseudo_bytes(32));
+            $password = hash('sha256', ($this->Password . $salt));
+            $sql = "INSERT INTO Logins(Username, Password, Salt, Person_ID)
+                Values(?,?,?,?,?,?,1)";
+            $sth = $dbh->prepare($sql);
+            $sth->execute([$this->Username, $password, $salt, $pid]);
+        }
+
+        self::$user = self::getPerson($pid);
         return self::user();
     }
 
@@ -127,6 +161,7 @@ class Person extends Entity {
         $sth = $dbh->prepare($sql);
         $sth->execute([$team->Team_ID, $user->Person_ID]);
         $this->Team_ID = $team->Team_ID;
+        return new Entity(['success' => 'Joined team']);
     }
 
     public function hasRole($role) {

@@ -46,11 +46,21 @@ class Team extends Entity {
            ApplicationError('Team', 'Unable to create team, user is already a member of a team!');
         }
 
+        if (isset($this->Captain_ID) && !$user->hasRole('Organizer')) {
+            ApplicationError("Team", "You must be an organizer to assign a specific captain");
+        } else if (isset($this->Captain_ID)) {
+            $user = Person::getPerson($this->Captain_ID);
+        }
+
+        if ($user->Team_ID != null) {
+            ApplicationError("Team", "You must not be part of a team to join a team!");
+        }
+
         $dbh = Database::getInstance();
         $sql = "INSERT INTO Teams(Team_Name, Captain_ID)
                 Values(?,?)";
         $sth = $dbh->prepare($sql);
-        $sth->execute([$this->Team_Name]);
+        $sth->execute([$this->Team_Name, $user->Person_ID]);
 
         $teamID = $dbh->lastInsertId();
         $user->joinTeam(self::getTeam($teamID));
