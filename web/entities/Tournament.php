@@ -53,10 +53,10 @@ class Tournament extends Entity {
         }
 
         $dbh = Database::getInstance();
-        $sql = "INSERT INTO Tournaments(Tournamnet_Name, Tournamnet_Organizer_ID)
+        $sql = "INSERT INTO Tournaments(Tournament_Name, Tournament_Organizer_ID)
                 Values(?,?)";
         $sth = $dbh->prepare($sql);
-        $sth->execute([$this->Tournamnet_Name, $user->Person_ID]);
+        $sth->execute([$this->Tournament_Name, $user->Person_ID]);
         return self::getTournament($dbh->lastInsertId());
     }
 
@@ -177,6 +177,38 @@ class Tournament extends Entity {
         $matches->addToData(['end' => $results]);
 
         return $matches;
+    }
+
+    public static function getTournaments($deleted = false) {
+        $results = new Entity();
+        $dbh = Database::getInstance();
+        $sql = "SELECT Tournament_ID
+                FROM Tournaments
+                WHERE Status = ?";
+        if (!$deleted) {
+            $sql .= " AND Deleted = 0";
+        }
+        $sth = $dbh->prepare($sql);
+        $sth->execute([0]);
+        $results->addToData(['pregame'=> $sth->fetchAll()]);
+        $sth->execute([1]);
+        $results->addToData(['inprogress' => $sth->fetchAll()]);
+        $sth->execute([2]);
+        $results->addToData(['over' => $sth->fetchAll()]);
+        return $results;
+    }
+
+    public function getTeams() {
+        $dbh = Database::getInstance();
+        $result = new Entity();
+        $sql = "SELECT t.*
+                FROM TournamentTeams tt
+                    INNER JOIN Teams t ON tt.Team_ID = t.Team_ID
+                WHERE tt.Tournament_ID = ?";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$this->Tournament_ID]);
+        $result->addToData(['tournament'=>$this->Tournament_ID, 'teams'=>$sth->fetchAll()]);
+        return $result;
     }
 
 }

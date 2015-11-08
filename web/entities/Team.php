@@ -106,13 +106,72 @@ class Team extends Entity {
     }
 
     public function matchesWon() {
-        //TODO: implement
-        return 0;
+        $dbh = Database::getInstance();
+        $sql = "SELECT COUNT(*) as count
+                FROM Matches
+                WHERE Winning_Team_ID=?";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$this->Team_ID]);
+        $results = $sth->fetch();
+        return $results['count'];
     }
 
     public function matchesLost() {
-        //TODO: implement
-        return 0;
+        $dbh = Database::getInstance();
+        $sql = "SELECT COUNT(*) as count
+                FROM Matches
+                WHERE Winning_Team_ID != ?
+                AND (Team_A_ID = ? OR Team_B_ID = ?)";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$this->Team_ID, $this->Team_ID, $this->Team_ID]);
+        $results = $sth->fetch();
+
+        return $results['count'];
+    }
+
+    public function getPlayers() {
+        $players = new Entity(['Team_ID'=>$this->Team_ID]);
+        $dbh = Database::getInstance();
+        $sql = "SELECT Person_ID
+                FROM Persons
+                WHERE Team_ID=?";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$this->Team_ID]);
+        $results = $sth->fetchAll(PDO::FETCH_COLUMN, 0);
+        $players->addToData(['Players'=>$results]);
+
+        return $players;
+    }
+
+    public function getRankings($tournament = null) {
+        $results = new Entity();
+        $results->addToData(['Team_ID'=>$this->Team_ID]);
+        $dbh = Database::getInstance();
+
+        //TODO: Flawed logic, will only return players which have scores goals, should put players who haven't scored on the bottom, sorted by name or something
+        if (isset($tournament)) {
+            $sql = "SELECT g.Player_ID, count(g.*) as count
+                    FROM Goals g
+                        INNER JOIN Matches m on g.Match_ID = m.Match_ID
+                        INNER JOIN Tournaments t on t.Tournament_ID = m.Tournament_ID
+                    WHERE g.Team_ID = ? AND
+                        t.Tournament_ID = ?
+                    GROUP BY Player_ID
+                    ORDER BY count DESC";
+            $sth = $dbh->prepare($sql);
+            $sth->execute([$this->Team_ID, $tournament->Tournament_ID]);
+            $results->addToData(['standings'=>$sth->fetchAll(PDO::FETCH_COLUMN, 0)]);
+        } else {
+            $sql = "SELECT Player_ID, count(*) as count
+                    FROM Goals
+                    WHERE Team_ID = ?
+                    GROUP BY Player_ID
+                    ORDER BY count DESC";
+            $sth = $dbh->prepare($sql);
+            $sth->execute([$this->Team_ID, $tournament->Tournament_ID]);
+            $results->addToData(['standings' => $sth->fetchAll(PDO::FETCH_COLUMN, 0)]);
+        }
+        return $results;
     }
 
 }

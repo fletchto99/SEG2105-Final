@@ -101,13 +101,32 @@ class Match extends Entity {
             ApplicationError('Match', "The match can't end in a tie! This is a tournament!");
         }
 
+        $winningTeamID = $goals_A > $goals_B ? $this->Team_A_ID : $this->Team_B_ID;
+
         $sql = "UPDATE Matches
-                SET Status = 2
+                SET Status = 2,
+                    Winning_Team_ID= ?
                 WHERE Match_ID = ?";
         $sth = $dbh->prepare($sql);
-        $sth->execute([$this->Match_ID]);
+        $sth->execute([$winningTeamID, $this->Match_ID]);
 
         return new Entity(['success' => 'Match ended!']);
+    }
+
+    public function withScores() {
+        $dbh = Database::getInstance();
+        $sql = "SELECT count(*) as count
+                FROM Goals
+                WHERE Match_ID = ?
+                AND Team_ID = ?";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$this->Match_ID, $this->Team_A_ID]);
+        $goals_A = $sth->fetch();
+        $sth->execute([$this->Match_ID, $this->Team_B_ID]);
+        $goals_B = $sth->fetch();
+        $this->addToData(['Team_A_Score'=>$goals_A]);
+        $this->addToData(['Team_B_Score'=>$goals_B]);
+        return $this;
     }
 
 }

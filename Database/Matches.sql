@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS `Matches` (
   `Tournament_ID` int(10) unsigned NOT NULL,
   `Team_A_ID` int(10) unsigned NOT NULL,
   `Team_B_ID` int(10) unsigned NOT NULL,
+  `Winning_Team_ID` int(10) unsigned DEFAULT NULL,
   `Next_Match_ID` int(11) unsigned DEFAULT NULL,
   `Last_Update_Datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Status` int(11) NOT NULL DEFAULT '0',
@@ -24,10 +25,12 @@ CREATE TABLE IF NOT EXISTS `Matches` (
   KEY `Team_A_ID` (`Team_A_ID`),
   KEY `Team_B_ID` (`Team_B_ID`),
   KEY `Next_Match_ID` (`Next_Match_ID`),
-  CONSTRAINT `Matches_ibfk_4` FOREIGN KEY (`Next_Match_ID`) REFERENCES `Matches` (`Match_ID`),
+  KEY `Winning_Team_ID` (`Winning_Team_ID`),
   CONSTRAINT `Matches_ibfk_1` FOREIGN KEY (`Tournament_ID`) REFERENCES `Tournaments` (`Tournament_ID`),
   CONSTRAINT `Matches_ibfk_2` FOREIGN KEY (`Team_A_ID`) REFERENCES `Teams` (`Team_ID`),
-  CONSTRAINT `Matches_ibfk_3` FOREIGN KEY (`Team_B_ID`) REFERENCES `Teams` (`Team_ID`)
+  CONSTRAINT `Matches_ibfk_3` FOREIGN KEY (`Team_B_ID`) REFERENCES `Teams` (`Team_ID`),
+  CONSTRAINT `Matches_ibfk_4` FOREIGN KEY (`Next_Match_ID`) REFERENCES `Matches` (`Match_ID`),
+  CONSTRAINT `Matches_iffk_5` FOREIGN KEY (`Winning_Team_ID`) REFERENCES `Teams` (`Team_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Dumping data for table mlanglois_SEG2105_Final.Matches: ~0 rows (approximately)
