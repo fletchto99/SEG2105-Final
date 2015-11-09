@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `Logins` (
   UNIQUE KEY `Username` (`Username`),
   UNIQUE KEY `Person_ID_UQ` (`Person_ID`),
   KEY `Person_ID` (`Person_ID`),
-  CONSTRAINT `Logins_ibfk` FOREIGN KEY (`Person_ID`) REFERENCES `PErsons` (`Person_ID`)
+  CONSTRAINT `Logins_ibfk` FOREIGN KEY (`Person_ID`) REFERENCES `Persons` (`Person_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Dumping data for table mlanglois_SEG2105_Final.Logins: ~0 rows (approximately)

@@ -13,7 +13,7 @@
 -- Dumping structure for table mlanglois_SEG2105_Final.Teams
 CREATE TABLE IF NOT EXISTS `Teams` (
   `Team_ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `Team_Name` int(10) unsigned NOT NULL,
+  `Team_Name` varchar(50) NOT NULL,
   `Team_Avatar` varchar(255) DEFAULT NULL,
   `Last_Update_Datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Captain_ID` int(10) unsigned DEFAULT NULL,
