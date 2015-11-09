@@ -22,7 +22,7 @@ class Team extends Entity {
             WHERE Team_ID=?";
         $sth = $dbh->prepare($sql);
         $sth->execute([$this->Team_ID]);
-        $results = $sth->fetchAll();
+        $results = $sth->fetch();
         if (!$results) {
             ApplicationError("Team", "No team found with the id: {$this->Team_ID}");
         }
@@ -132,12 +132,12 @@ class Team extends Entity {
     public function getPlayers() {
         $players = new Entity(['Team_ID'=>$this->Team_ID]);
         $dbh = Database::getInstance();
-        $sql = "SELECT Person_ID
+        $sql = "SELECT Person_ID, First_Name, Last_Name, Jersey_Number
                 FROM Persons
                 WHERE Team_ID=?";
         $sth = $dbh->prepare($sql);
         $sth->execute([$this->Team_ID]);
-        $results = $sth->fetchAll(PDO::FETCH_COLUMN, 0);
+        $results = $sth->fetchAll();
         $players->addToData(['Players'=>$results]);
 
         return $players;
@@ -172,6 +172,17 @@ class Team extends Entity {
             $results->addToData(['standings' => $sth->fetchAll(PDO::FETCH_COLUMN, 0)]);
         }
         return $results;
+    }
+
+    public function checkAvaliableJerseyNumber($number) {
+        $players = $this->getPlayers();
+        $playersIter = $players->each()['players'];
+        foreach ($playersIter as $player) {
+            if (isset($player['Jersey_Number']) && is_int($player['Jersey_Number']) && $number == intval($player['Jersey_Number'])) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

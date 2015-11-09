@@ -18,7 +18,7 @@ class Match extends Entity {
             WHERE Match_ID=?";
         $sth = $dbh->prepare($sql);
         $sth->execute([$this->Match_ID]);
-        $results = $sth->fetchAll();
+        $results = $sth->fetch();
         if (!$results) {
             ApplicationError("Match", "No match found with the id: {$this->Match_ID}");
         }

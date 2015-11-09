@@ -18,7 +18,7 @@ class Tournament extends Entity {
             WHERE Tournament_ID=?";
         $sth = $dbh->prepare($sql);
         $sth->execute([$this->Tournament_ID]);
-        $results = $sth->fetchAll();
+        $results = $sth->fetch();
         if (!$results) {
             ApplicationError("Tournament", "No tournament found with the id: {$this->Tournament_ID}");
         }

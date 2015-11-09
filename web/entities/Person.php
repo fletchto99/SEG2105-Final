@@ -19,13 +19,13 @@ class Person extends Entity {
 
         $dbh = Database::getInstance();
         $sql =
-            "SELECT p.Person_ID, p.First_Name, p.Last_Name, p.Username, p.Jersey_Number, p.Avatar, p.Team_ID r.Role_Name
-             FROM Persons
-                INNER JOIN Roles r ON r.Role_ID = p.Role_Id
+            "SELECT p.Person_ID, p.First_Name, p.Last_Name, p.Jersey_Number, p.Avatar, p.Team_ID, r.Role_Name
+             FROM Persons p
+                INNER JOIN Roles r ON r.Role_ID = p.Role_ID
              WHERE p.Person_ID = ?";
         $sth = $dbh->prepare($sql);
         $sth->execute([$this->Person_ID]);
-        $results = $sth->fetchAll();
+        $results = $sth->fetch();
         if (!$results) {
             ApplicationError("Person", "No person found with the id: {$this->Person_ID}");
         }
@@ -130,7 +130,7 @@ class Person extends Entity {
             $salt = bin2hex(openssl_random_pseudo_bytes(32));
             $password = hash('sha256', ($this->Password . $salt));
             $sql = "INSERT INTO Logins(Username, Password, Salt, Person_ID)
-                Values(?,?,?,?,?,?,1)";
+                Values(?,?,?,?)";
             $sth = $dbh->prepare($sql);
             $sth->execute([$this->Username, $password, $salt, $pid]);
         }
@@ -140,10 +140,17 @@ class Person extends Entity {
     }
 
     public function joinTeam($team) {
-        $user = Person::user();
 
-        if (isset($user->Team_ID) && is_int($user->Team_ID)) {
+        if (isset($this->Team_ID) && is_int($this->Team_ID)) {
             ApplicationError('Team', 'You are already part of a team!');
+        }
+
+        if (!isset($this->Jersey_Number) || !is_int($this->Jersey_Number)) {
+            ApplicationError('User', 'You need a jersey number before you can join a team!');
+        }
+
+        if (!$team->checkAvaliableJerseyNumber($this->Jersey_Number)) {
+            ApplicationError("Number", "The number {$this->Jersey_Number} is already taken on {$team->Team_Name}");
         }
 
         $dbh = Database::getInstance();
@@ -161,7 +168,7 @@ class Person extends Entity {
                 SET Team_ID=?
                 WHERE Person_ID=?";
         $sth = $dbh->prepare($sql);
-        $sth->execute([$team->Team_ID, $user->Person_ID]);
+        $sth->execute([$team->Team_ID, $this->Person_ID]);
         $this->Team_ID = $team->Team_ID;
         return new Entity(['success' => 'Joined team']);
     }
@@ -184,6 +191,20 @@ class Person extends Entity {
         if (!$this->hasRole('Player')) {
             ApplicationError("Player", "You must be a player to have a jersey number!");
         }
+
+        if (!is_int($number)) {
+            ApplicationError("Number", "The jersey number must be a valid integer!");
+        }
+
+        $number = intval($number);
+
+        if (isset($this->Team_ID) && is_int($this->Team_ID)) {
+            $team = Team::getTeam($this->Team_ID);
+            if (!$team->checkAvaliableJerseyNumber($number)) {
+                ApplicationError("Number", "The number {$number} is already taken on {$team->Team_Name}");
+            }
+        }
+
         $sql = "UPDATE Persons
                 SET Jersey_Number=?
                 WHERE Person_ID=?";
