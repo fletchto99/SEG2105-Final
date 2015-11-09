@@ -48,7 +48,7 @@ class Tournament extends Entity {
             ApplicationError('Permissions', 'You do not have the required role to create a tournament');
         }
 
-        if (isset($user->Team_ID) && is_int($user->Team_ID)) {
+        if (isset($user->Team_ID) && is_numeric($user->Team_ID)) {
             ApplicationError('Team', 'Unable to create team, user is already a member of a team!');
         }
 

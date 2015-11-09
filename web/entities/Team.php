@@ -43,7 +43,7 @@ class Team extends Entity {
     public function create() {
         $user = Person::user();
 
-        if (isset($user->Team_ID) && is_int($user->Team_ID)) {
+        if (isset($user->Team_ID) && is_numeric($user->Team_ID)) {
            ApplicationError('Team', 'Unable to create team, user is already a member of a team!');
         }
 
@@ -56,6 +56,12 @@ class Team extends Entity {
         if ($user->Team_ID != null) {
             ApplicationError("Team", "You must not be part of a team to join a team!");
         }
+
+        if (!isset($user->Jersey_Number) || !is_numeric($user->Jersey_Number)) {
+            var_dump($user);
+            ApplicationError('User', 'You need a jersey number before you can create a team!');
+        }
+
 
         $dbh = Database::getInstance();
         $sql = "INSERT INTO Teams(Team_Name, Captain_ID)
@@ -174,11 +180,11 @@ class Team extends Entity {
         return $results;
     }
 
-    public function checkAvaliableJerseyNumber($number) {
+    public function checkAvailableJerseyNumber($number) {
         $players = $this->getPlayers();
-        $playersIter = $players->each()['players'];
+        $playersIter = $players->each()['Players'];
         foreach ($playersIter as $player) {
-            if (isset($player['Jersey_Number']) && is_int($player['Jersey_Number']) && $number == intval($player['Jersey_Number'])) {
+            if (isset($player['Jersey_Number']) && is_numeric($player['Jersey_Number']) && $number == intval($player['Jersey_Number'])) {
                 return false;
             }
         }

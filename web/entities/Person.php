@@ -139,17 +139,17 @@ class Person extends Entity {
         return self::user();
     }
 
-    public function joinTeam($team) {
+    public function joinTeam(Team $team) {
 
-        if (isset($this->Team_ID) && is_int($this->Team_ID)) {
+        if (isset($this->Team_ID) && is_numeric($this->Team_ID)) {
             ApplicationError('Team', 'You are already part of a team!');
         }
 
-        if (!isset($this->Jersey_Number) || !is_int($this->Jersey_Number)) {
+        if (!isset($this->Jersey_Number) || !is_numeric($this->Jersey_Number)) {
             ApplicationError('User', 'You need a jersey number before you can join a team!');
         }
 
-        if (!$team->checkAvaliableJerseyNumber($this->Jersey_Number)) {
+        if (!$team->checkAvailableJerseyNumber($this->Jersey_Number)) {
             ApplicationError("Number", "The number {$this->Jersey_Number} is already taken on {$team->Team_Name}");
         }
 
@@ -192,15 +192,15 @@ class Person extends Entity {
             ApplicationError("Player", "You must be a player to have a jersey number!");
         }
 
-        if (!is_int($number)) {
+        if (!is_numeric($number)) {
             ApplicationError("Number", "The jersey number must be a valid integer!");
         }
 
         $number = intval($number);
 
-        if (isset($this->Team_ID) && is_int($this->Team_ID)) {
+        if (isset($this->Team_ID) && is_numeric($this->Team_ID)) {
             $team = Team::getTeam($this->Team_ID);
-            if (!$team->checkAvaliableJerseyNumber($number)) {
+            if (!$team->checkAvailableJerseyNumber($number)) {
                 ApplicationError("Number", "The number {$number} is already taken on {$team->Team_Name}");
             }
         }
@@ -269,7 +269,7 @@ class Person extends Entity {
         $this->addToData(['Assists' => $results['count']]);
 
         //TODO: Flaw exists here as it only calculates for the current team. Our data structure currently would not support looking up matches won with other teams
-        if (isset($this->Team_ID) && is_int($this->Team_ID)) {
+        if (isset($this->Team_ID) && is_numeric($this->Team_ID)) {
             $team = Team::getTeam($this->Team_ID);
             $this->addToData(['Matches_With_Team' => ['Won' => $team->matchesWon(), 'Lost' => $team->matchesLost()]]);
             $this->addToData(['Active_Tournaments' => $team->getTournaments(1)]);
