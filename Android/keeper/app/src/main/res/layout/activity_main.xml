@@ -21,7 +21,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Get Weather"
+        android:text="Create Account"
         android:id="@+id/getTxt"
         android:onClick="getText"
         android:layout_alignParentBottom="true"
