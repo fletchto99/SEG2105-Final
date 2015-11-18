@@ -1,0 +1,84 @@
+class Model{
+  Keeper{
+    IdleLoggedOut{
+      PressLogin -> TryLogin;
+      PressRegister -> CreateUser;
+    }
+    IdleLoggedIn{
+      PressNewTournament -> AuthenticateOrganizer;
+      PressLoadTournament -> LoadTournament;
+    }
+    LoadTournament{
+      GetFromServer -> TournamentRunning;
+    }
+    InitializedNewTournament{
+      BuildTournament -> BuildNew;
+    }
+    AuthenticateOrganizer{
+      Success -> InitializedNewTournament;
+      Failure -> IdleLoggedIn;
+    }
+    CreateUser{
+      EnterFirstName{
+        ValidName -> EnterLastName;
+        InvalidName -> EnterFirstName;
+      }
+      EnterLastName{
+        ValidName -> EnterUserName;
+        InvalidName -> EnterLastName;
+      }
+      EnterUserName{
+        ValidName -> EnterPassword;
+        InvalidName -> EnterUserName;
+      }
+      EnterPassword{
+        ValidPassword -> IdleLoggedIn;
+        InvalidPassword -> EnterPassword;
+      }
+    }
+    TryLogin{
+      Successful -> IdleLoggedIn;
+      Failure -> IdleLoggedOut;;
+    }
+    BuildNew{
+      StartBuild{
+        Process -> AddTeam;
+      }
+      AddTeam{
+        AddAnother -> AddTeam;
+        FinishedTeams -> AddPlayer;
+      }
+      AddPlayer{
+        AddAnother -> AddPlayer;
+        FinishedPlayers -> SelectType;
+      }
+      SelectType{
+        SelectedTournamentType -> FinishBuild;
+      }
+      FinishBuild{
+        Process -> Syncing;
+      }
+      Syncing{
+        FinishedSync -> TournamentCreated;
+        FailedSync -> Syncing;
+      }
+    }
+    TournamentCreated{
+      StartButton -> TournamentRunning;
+    }
+    TournamentRunning{
+      EliminateTeam -> AuthenticateUser;
+      TournamentCompleted -> Finished;
+    }
+    AuthenticateUser{
+      Success -> EliminateTeam;
+      Failure -> TournamentRunning;
+    }
+    EliminateTeam{
+      SyncedElimination -> TournamentRunning;
+    }
+    Finished{
+      entry/{notifyTeam();}
+    }
+  }
+}
