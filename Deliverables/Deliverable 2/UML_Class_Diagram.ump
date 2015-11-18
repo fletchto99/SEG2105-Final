@@ -1,0 +1,56 @@
+class Login {
+    String username;
+    String password;
+    String salt;
+}
+
+class Person {
+    1 -- 1 Login;
+    String firstName;
+    String lastName;
+    String avatarImagePath;
+}
+
+class Player {
+    isA Person;
+    1..* players -- 1 Team players;
+    Integer jerseyNumber;
+    String role;
+}
+
+class Organizer {
+    isA Person;
+    String role;
+}
+
+class Team {
+    1 -- 1 Player captain;
+    String teamName;
+    String teamAvatarPath;
+}
+
+class Match {
+    0..1 -- 0..1 Match nextMatch;
+    1..* tournament -- 1 Tournament tournament;
+    * teamA -- 1 Team teamA;
+    * teamB -- 1 Team teamB;
+    * winningTeam -- 0..1 Team winningTeam;
+
+    Integer status;
+}
+
+class Goals {
+    0..* goalScorer -- 1 Player goalScorer;
+    0..* assister -- 1 Player assister;
+    0..* -- 1 Match match;
+    0..* team -- 1 Team team;
+}
+
+class Tournament {
+    * organizer -- 1 Organizer organizer;
+    * winner -- 1 Team winner;
+    * teams -- * Team teams;
+    String name;
+    String type;
+    Integer status;
+}
