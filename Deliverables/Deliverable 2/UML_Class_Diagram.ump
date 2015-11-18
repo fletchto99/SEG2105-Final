@@ -5,7 +5,7 @@ class Login {
 }
 
 class Person {
-    1 -- 1 Login;
+    1 <- 0..1 Login;
     String firstName;
     String lastName;
     String avatarImagePath;
@@ -13,7 +13,8 @@ class Person {
 
 class Player {
     isA Person;
-    1..* players -- 1 Team players;
+    1..* players -- 1 Team my_team;
+
     Integer jerseyNumber;
     String role;
 }
@@ -24,13 +25,13 @@ class Organizer {
 }
 
 class Team {
-    1 -- 1 Player captain;
+    1 -<@> 1 Player captain;
     String teamName;
     String teamAvatarPath;
 }
 
 class Match {
-    0..1 -- 0..1 Match nextMatch;
+    0..1 -> 0..1 Match nextMatch;
     1..* tournament -- 1 Tournament tournament;
     * teamA -- 1 Team teamA;
     * teamB -- 1 Team teamB;
@@ -39,11 +40,11 @@ class Match {
     Integer status;
 }
 
-class Goals {
+class Goal {
     0..* goalScorer -- 1 Player goalScorer;
-    0..* assister -- 1 Player assister;
-    0..* -- 1 Match match;
-    0..* team -- 1 Team team;
+    0..* assister -- 0..1 Player assister;
+    0..* goals -- 1 Match;
+    0..* team -- 1 Team team_goals;
 }
 
 class Tournament {
