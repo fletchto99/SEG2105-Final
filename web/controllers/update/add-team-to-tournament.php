@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../bootstrap.php';
 authenticate();
 
 $input = new Entity();
-$input->$this->fromJSON();
+$input->fromJSON();
 $input->checkKeys(['Tournament_ID', 'Team_ID']);
 $tournament = Tournament::getTournament($input->Tournament_ID);
 $team = Team::getTeam($input->Team_ID);

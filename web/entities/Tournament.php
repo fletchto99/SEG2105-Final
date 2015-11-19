@@ -79,6 +79,10 @@ class Tournament extends Entity {
             ApplicationError("Tournament", "The tournament has already begun! Unable to join.");
         }
 
+        if (intval($team->Deleted) === 1) {
+            ApplicationError("Tournament", "Only active teams can join tournaments!");
+        }
+
         $dbh = Database::getInstance();
         $sql = "INSERT INTO TournamentTeams(Tournament_ID, Team_ID)
                 Values(?,?)";
