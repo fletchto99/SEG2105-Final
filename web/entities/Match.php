@@ -85,6 +85,10 @@ class Match extends Entity {
             ApplicationError("Match", "A match must be in the pre-game phase to be started!");
         }
 
+        if(!isset($this->Team_A_ID) || !isset($this->Team_B_ID) || !is_numeric($this->Team_A_ID) || !is_numeric($this->Team_B_ID)) {
+            ApplicationError("Match", "Both teams must be set before a match can begin");
+        }
+
         $dbh = Database::getInstance();
         $sql = "UPDATE Matches
                 SET Status = 1
@@ -126,6 +130,15 @@ class Match extends Entity {
                 WHERE Match_ID = ?";
         $sth = $dbh->prepare($sql);
         $sth->execute([$winningTeamID, $this->Match_ID]);
+
+        if ($this->Next_Match_ID) {
+            $nextMatch = Match::getMatch($this->Next_Match_ID);
+            $sql = "UPDATE Matches
+                SET ".((isset($nextMatch->Team_A_ID) && is_numeric($nextMatch->Team_A_ID)) ? "Team_B_ID" : "Team_A_ID")." = ?
+                WHERE Match_ID = ?";
+            $sth = $dbh->prepare($sql);
+            $sth->execute([$winningTeamID, $nextMatch->Match_ID]);
+        }
 
         return new Entity(['success' => 'Match ended!']);
     }
