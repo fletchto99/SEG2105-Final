@@ -16,3 +16,9 @@
  */
 
 require_once __DIR__ . '/../../bootstrap.php';
+
+$input = new Entity();
+$input->fromJSON();
+$input->checkKeys(['Tournament_ID']);
+$standings =  Tournament::getTournament($input->Tournament_ID)->getStandings();
+echo $standings->toJSON();

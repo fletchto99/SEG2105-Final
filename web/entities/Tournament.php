@@ -151,7 +151,7 @@ class Tournament extends Entity {
         if (!is_numeric($Tournament_Type) || (intval($Tournament_Type) < 0 || intval($Tournament_Type) > 2)) {
             ApplicationError("Tournament", "The tournament must be of value 0 (Knock Out), 1 (Round Robin) or 2(Knock out round robin)!");
         }
-        $teams = $this->getTeams()['teams'];
+        $teams = $this->getTeams()->Teams;
         $numRegistered = sizeof($teams);
 
         if ($numRegistered < 2) {
@@ -274,7 +274,19 @@ class Tournament extends Entity {
                 WHERE tt.Tournament_ID = ?";
         $sth = $dbh->prepare($sql);
         $sth->execute([$this->Tournament_ID]);
-        $result->addToData(['tournament'=>$this->Tournament_ID, 'teams'=>$sth->fetchAll()]);
+        $result->addToData(['Tournament'=>$this->Tournament_ID, 'Teams'=>$sth->fetchAll()]);
+        return $result;
+    }
+
+    public function getStandings() {
+        if (intval($this->Status) === 0) {
+            ApplicationError("Tournament", "A tournament must be started before the standings can be retrieved");
+        }
+        $result = new Entity(['Tournament_ID'=>$this->Tournament_ID, 'Tournament_Type'=>$this->Tournamnet_Type]);
+
+        if ($this->Tournamnet_Type == 1) {
+            //TODO: Implement
+        }
         return $result;
     }
 
