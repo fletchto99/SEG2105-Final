@@ -18,6 +18,7 @@ require_once 'entities/Person.php';
 require_once 'entities/Match.php';
 require_once 'entities/Team.php';
 require_once 'entities/Tournament.php';
+require_once 'lib/Utils.php';
 
 /**
  * Sends an error message to the client

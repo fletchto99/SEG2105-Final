@@ -143,7 +143,70 @@ class Tournament extends Entity {
         if ($this->Status != 0) {
             ApplicationError("Tournament", "A tournament must be in the planning phase to be started!");
         }
-        //TODO: Complete!
+
+        if (!is_numeric($Tournament_Type) || (intval($Tournament_Type) < 0 || intval($Tournament_Type) > 2)) {
+            ApplicationError("Tournament", "The tournament must be of value 0 (Knock Out), 1 (Round Robin) or 2(Knock out round robin)!");
+        }
+        $teams = $this->getTeams()['teams'];
+        $numRegistered = sizeof($teams);
+
+        if ($numRegistered < 2) {
+            ApplicationError("Tournament", "You need at least 2 teams registered before the tournament can begin!");
+        }
+
+        if (($Tournament_Type == 0 || $Tournament_Type == 2) && ($numRegistered & ($numRegistered - 1) != 0)) {
+
+            $numRequired = $numRegistered - 1;//Subtract 1 to handle the case that we are already a power of 2
+            $numRequired |= $numRequired >> 1;//shift all bits to 1
+            $numRequired |= $numRequired >> 2;//shift all bits to 1
+            $numRequired |= $numRequired >> 4;//shift all bits to 1
+            $numRequired |= $numRequired >> 8;//shift all bits to 1
+            $numRequired |= $numRequired >> 16;//Support up to 32bit integer or 0x8000_0000
+            $numRequired -= ($numRegistered-1);//Subtract our original
+
+            ApplicationError("Tournament", "You n^2 teams to perform a knockout style tournament! That means you need {$numRequired} more teams!");
+        }
+        if ($Tournament_Type == 0) {
+            if ($numRegistered > 2) {
+                $matches = [];
+                array_push($matches, Match::create($this->Tournament_ID));
+                while (sizeof($matches) !== ($numRegistered / 4)) {
+                    $tmpMatches = [];
+                    foreach ($matches as $match) {
+                        array_push($matches, Match::create($this->Tournament_ID, $match->Match_ID));
+                        array_push($matches, Match::create($this->Tournament_ID, $match->Match_ID));
+                    }
+                    $matches = $tmpMatches;
+                }
+                for($i = 0; $i < sizeof($matches); $i++) {
+                    Match::create($this->Tournament_ID, $matches[$i]->Match_ID, $teams[2*$i]->Team_ID, $teams[(2 * $i)+1]->Team_ID);
+                }
+            } else {
+                Match::create($this->Tournament_ID, null, $teams[0]->Team_ID, $teams[1]->Team_ID);
+            }
+        } else if ($Tournament_Type == 1) {
+            $matches = [];
+            $teamsRotated = $teams;
+            if (sizeof($teamsRotated)%2!=0) {
+                array_push($teamsRotated, null);
+            }
+            $mid = sizeof($teamsRotated) / 2;
+            do {
+                for ($i = 0; $i < $mid; $i++) {
+                    if ($teamsRotated[$i] !== null && $teamsRotated[$i+$mid] !== null) {
+                        array_push($matches, ['Team_A_ID' => $teamsRotated[$i]->Team_ID, 'Team_B_ID' => $teamsRotated[$i + $mid]->Team_ID]);
+                    }
+                }
+                $teamsRotated = Utils::rotateArray($teamsRotated);
+            } while($teamsRotated !== $teams);
+            foreach($matches as $match) {
+                Match::create($this->Tournamnet_ID, null, $match['Team_A_ID'], $match['Team_B_ID']);
+            }
+        } else if($Tournament_Type) {
+            //TODO: Implement krr tournament type
+            ApplicationError("Matches", "This tournament type is not yet implemented! Sorry!");
+        }
+
     }
 
     public function getMatches() {

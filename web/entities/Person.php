@@ -116,6 +116,14 @@ class Person extends Entity {
             }
         }
 
+        if (!ctype_alnum($this->Username)) {
+            ApplicationError('Login', "A username may contain letters and numbers only!");
+        }
+
+        if (!ctype_alnum($this->Password)) {
+            ApplicationError('Login', "A password may contain letter and numbers only!");
+        }
+
         $sql = "INSERT INTO Persons(First_Name, Last_Name, Jersey_Number, Role_ID)
                 VALUES (?,?,?,?)";
         $sth = $dbh->prepare($sql);

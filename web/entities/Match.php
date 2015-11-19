@@ -36,6 +36,23 @@ class Match extends Entity {
         return $match;
     }
 
+    public static function create($tournamentID, $nextMatchID = null, $teamAID = null, $teamBID = null) {
+        $user = Person::user();
+        if (!$user->hasRole('Organizer')) {
+            ApplicationError("Match", "You must be a tournament organizer to create a match!");
+        }
+        if (!is_numeric($tournamentID)) {
+            ApplicationError("Match", "A valid tournament is required to make a match!");
+        }
+        $sql = "INSERT INTO Matches(Tournament_ID, Team_A_ID, Team_B_ID, Next_Match_ID)
+                VALUES (?,?,?,?)";
+        $dbh = Database::getInstance();
+        $sth = $dbh->prepare($sql);
+
+        $sth->execute([$tournamentID, $teamAID, $teamBID, $nextMatchID]);
+        return self::getMatch($dbh->lastInsertId());
+    }
+
     public function addGoal($player, $assister=null) {
         $user = Person::user();
         if (!$user->hasRole('Organizer')) {
