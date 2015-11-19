@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS `TournamentTeams` (
   `Tournament_Team_ID` int(10) unsigned NOT NULL,
   `Tournament_ID` int(10) unsigned NOT NULL,
   `Team_ID` int(10) unsigned NOT NULL,
-  `Withdrawen` bit(1) NOT NULL DEFAULT b'0',
+  `Withdrawn` bit(1) NOT NULL DEFAULT b'0',
   `Last_Update_Datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY `Tournament_ID` (`Tournament_ID`,`Team_ID`),
   KEY `Team_ID` (`Team_ID`),
