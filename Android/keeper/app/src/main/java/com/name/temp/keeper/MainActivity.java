@@ -19,41 +19,63 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Data.createInstance(this);
     }
 
     public void getText(View view) {
+
         final TextView text = (TextView) findViewById(R.id.txtDisplay);
-        JSONObject data = new JSONObject();
-        try {
 
-            //TODO: Replace with form data instead of hardcoded values
-            data.put("Username", "Example3");
-            data.put("Password", "Example3");
-            data.put("First_Name", "Matt");
-            data.put("Last_Name", "Langlois");
+        WebErrorListener errorListener = new WebErrorListener() {
+            @Override
+            public void onError(JSONObject error) {
+                text.setText(error.toString());
+            }
+        };
 
-            //The endpoint which we are targeting
-            String controller = "create-user";
+        Listener<String> listener= new Listener<String>() {
 
-            //How to handle an error when the endpoint generates on
-            WebErrorListener errorListener = new WebErrorListener() {
-                @Override
-                public void onError(JSONObject error) {
-                    text.setText(error.toString());
-                }
-            };
+            @Override
+            public void onResponse(String response) {
+                text.setText(response);
+            }
 
-            Listener<JSONObject> listener= new Listener<JSONObject>() {
+        };
 
-                public void onResponse(JSONObject response) {
-                    text.setText(response.toString());
-                }
-            };
+        Data.getInstance().authenticate("test", "test2", listener, errorListener);
 
-            Data.getInstance(this).update(data, controller, listener, errorListener);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+
+//        JSONObject data = new JSONObject();
+//        try {
+//
+//            //TODO: Replace with form data instead of hardcoded values
+//            data.put("Username", "Example3");
+//            data.put("Password", "Example3");
+//            data.put("First_Name", "Matt");
+//            data.put("Last_Name", "Langlois");
+//
+//            //The endpoint which we are targeting
+//            String controller = "create-user";
+//
+//            //How to handle an error when the endpoint generates on
+//            WebErrorListener errorListener = new WebErrorListener() {
+//                @Override
+//                public void onError(JSONObject error) {
+//                    text.setText(error.toString());
+//                }
+//            };
+//
+//            Listener<JSONObject> listener= new Listener<JSONObject>() {
+//
+//                public void onResponse(JSONObject response) {
+//                    text.setText(response.toString());
+//                }
+//            };
+//
+//            Data.getInstance(this).update(data, controller, listener, errorListener);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
 
 
     }
