@@ -29,8 +29,6 @@ public class CreateAccountActivity extends Activity {
 
         JSONObject data = new JSONObject();
         try {
-
-            //TODO: Replace with form data instead of hardcoded values
             data.put("Username", ((EditText) findViewById(R.id.usernameInput)).getText().toString());
             data.put("Password", ((EditText) findViewById(R.id.passwordInput)).getText().toString());
             data.put("First_Name", ((EditText) findViewById(R.id.firstNameInput)).getText().toString());
