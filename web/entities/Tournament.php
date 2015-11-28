@@ -45,7 +45,7 @@ class Tournament extends Entity {
         $user = Person::user();
 
         if (!$user->hasRole('Organizer')) {
-            ApplicationError('Permissions', 'You do not have the required role to create a tournament');
+            ApplicationError('Permissions', 'You do not have the required role to create a tournament', 403);
         }
 
         if (isset($user->Team_ID) && is_numeric($user->Team_ID)) {
@@ -70,7 +70,7 @@ class Tournament extends Entity {
         $user = Person::user();
 
         if ($team->Captain_ID != $user->Person_ID && !$user->hasRole('Organizer')) {
-            ApplicationError("Team", "You must be the team captain to join a tournament!");
+            ApplicationError("Team", "You must be the team captain to join a tournament!", 403);
         }
         if ($this->Deleted == 1) {
             ApplicationError("Tournament", "The tournament has been canceled! Unable to join.");
@@ -95,7 +95,7 @@ class Tournament extends Entity {
     public function end() {
         $user = Person::user();
         if (!$user->hasRole('Organizer')) {
-            ApplicationError("Tournament", "You are not a tournament organizer!");
+            ApplicationError("Tournament", "You are not a tournament organizer!", 403);
         }
         if ($this->Status != 1) {
             ApplicationError("Tournament", "The tournament is not in progress!");
@@ -125,7 +125,7 @@ class Tournament extends Entity {
     public function delete() {
         $user = Person::user();
         if (!$user->hasRole('Organizer')) {
-            ApplicationError("Permissions", "You must be an organizer to delete a tournament!");
+            ApplicationError("Permissions", "You must be an organizer to delete a tournament!", 403);
         }
         if ($this->Status != 0) {
             ApplicationError("Tournament", "A tournament must be in the planning phase to be deleted!");
@@ -142,7 +142,7 @@ class Tournament extends Entity {
     public function begin($Tournament_Type) {
         $user = Person::user();
         if (!$user->hasRole('Organizer')) {
-            ApplicationError("Permissions", "You must be an organizer to start a tournament!");
+            ApplicationError("Permissions", "You must be an organizer to start a tournament!", 403);
         }
         if ($this->Status != 0) {
             ApplicationError("Tournament", "A tournament must be in the planning phase to be started!");

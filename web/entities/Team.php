@@ -48,7 +48,7 @@ class Team extends Entity {
         }
 
         if (isset($this->Captain_ID) && !$user->hasRole('Organizer')) {
-            ApplicationError("Team", "You must be an organizer to assign a specific captain");
+            ApplicationError("Team", "You must be an organizer to assign a specific captain", 403);
         } else if (isset($this->Captain_ID)) {
             $user = Person::getPerson($this->Captain_ID);
         }
@@ -82,7 +82,7 @@ class Team extends Entity {
     public function updateName($Team_Name) {
         $user = Person::user();
         if ($user->Person_ID != $this->Captain_ID || !$user->hasRole('Organizer')) {
-            ApplicationError("Team", "You must be the team captain or an event organizer to rename a team!");
+            ApplicationError("Team", "You must be the team captain or an event organizer to rename a team!", 403);
         }
         $sql = "UPDATE Teams
                 SET Team_Name=?

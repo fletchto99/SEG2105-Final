@@ -44,6 +44,14 @@ function Authenticate() {
     Person::user();
 }
 
+function logout() {
+    if (session_status() == PHP_SESSION_ACTIVE) {
+        session_unset();
+        return session_destroy();
+    }
+    return false;
+}
+
 function fatalHandler() {
     $error = error_get_last();
     if ($error["type"] == E_ERROR) {

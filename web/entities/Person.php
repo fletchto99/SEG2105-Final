@@ -57,19 +57,25 @@ class Person extends Entity {
     public static function user() {
         if (!isset(self::$user)) {
             session_start();
-            if (!isset($_SERVER['PHP_AUTH_USER'])) {
+            if (!isset($_SESSION['auth']) && !isset($_SERVER['PHP_AUTH_USER'])) {
                 ApplicationError("Authentication", "Authentication credentials not defined!", 401);
+            }
+            if(isset($_SERVER['PHP_AUTH_USER'])) {
+                if (empty($_SERVER['PHP_AUTH_USER'])) {
+                    ApplicationError("Authentication", "Username cannot be blank!", 401);
+                }
+                $_SESSION['auth'] = $_SERVER['PHP_AUTH_USER'];
             }
             $sql = "SELECT Person_ID, Password, Salt
                     FROM Logins
                     WHERE Username = ? LIMIT 1";
             $dbh = Database::getInstance();
             $sth = $dbh->prepare($sql);
-            $sth->execute([$_SERVER['PHP_AUTH_USER']]);
+            $sth->execute([$_SESSION['auth']]);
             $results = $sth->fetch();
             if (!$results) {
-                ApplicationError("Authentication", "Your user account (${_SERVER['PHP_AUTH_USER']}) does not exist within the application.", 401);
-            } else if ($results['Password'] != hash('sha256', ($_SERVER['PHP_AUTH_PW'] . $results['Salt']))) {
+                ApplicationError("Authentication", "Your user account (${_SESSION['auth']}) does not exist within the application.", 401);
+            } else if (isset($_SERVER['PHP_AUTH_USER']) && $results['Password'] != hash('sha256', ($_SERVER['PHP_AUTH_PW'] . $results['Salt']))) {
                 ApplicationError("Authentication", "Invalid password.", 401);
             }
             self::$user = self::getPerson($results['Person_ID']);
@@ -91,6 +97,22 @@ class Person extends Entity {
     public function create($personOnly = false) {
         $dbh = Database::getInstance();
 
+        if (!ctype_alnum($this->Username)) {
+            ApplicationError('Login', "A username may contain letters and numbers only!");
+        }
+
+        if (!ctype_alnum($this->Password)) {
+            ApplicationError('Login', "A password may contain letter and numbers only!");
+        }
+
+        if (strlen($this->Username) < 5 || strlen($this->Password) < 5) {
+            ApplicationError('Login', "Username and password must have at least 5 characters!");
+        }
+
+        if (empty($this->First_Name) || empty($this->Last_Name)) {
+            ApplicationError('Login', "First name and last name must be set!");
+        }
+
         if (!$personOnly) {
             $sql =
                 "SELECT COUNT(*) as count
@@ -105,23 +127,15 @@ class Person extends Entity {
         } else {
             $user = Person::user();
             if (!$user->hasRole('Organizer')) {
-                ApplicationError('Permission', "You must be an organizer to create a player only!");
+                ApplicationError('Permission', "You must be an organizer to create a player only!", 403);
             }
         }
 
         if (isset($this->Role_ID)) {
             $user = Person::user();
             if (!$user->hasRole('Organizer')) {
-                ApplicationError('Permission', "You must be an organizer to create an account with a specific role!");
+                ApplicationError('Permission', "You must be an organizer to create an account with a specific role!", 403);
             }
-        }
-
-        if (!ctype_alnum($this->Username)) {
-            ApplicationError('Login', "A username may contain letters and numbers only!");
-        }
-
-        if (!ctype_alnum($this->Password)) {
-            ApplicationError('Login', "A password may contain letter and numbers only!");
         }
 
         $sql = "INSERT INTO Persons(First_Name, Last_Name, Jersey_Number, Role_ID)
@@ -141,6 +155,9 @@ class Person extends Entity {
                 Values(?,?,?,?)";
             $sth = $dbh->prepare($sql);
             $sth->execute([$this->Username, $password, $salt, $pid]);
+            logout();
+            session_start();
+            $_SESSION['auth'] = $this->Username;
         }
 
         self::$user = self::getPerson($pid);
@@ -197,7 +214,7 @@ class Person extends Entity {
 
     public function updateJerseyNumber($number) {
         if (!$this->hasRole('Player')) {
-            ApplicationError("Player", "You must be a player to have a jersey number!");
+            ApplicationError("Player", "You must be a player to have a jersey number!", 403);
         }
 
         if (!is_numeric($number)) {
@@ -205,6 +222,10 @@ class Person extends Entity {
         }
 
         $number = intval($number);
+
+        if ($number == $this->Jersey_Number) {
+            ApplicationError("Number", "{$number} is already your jersey number!");
+        }
 
         if (isset($this->Team_ID) && is_numeric($this->Team_ID)) {
             $team = Team::getTeam($this->Team_ID);
@@ -225,7 +246,7 @@ class Person extends Entity {
 
     public function leaveTeam() {
         if (!$this->hasRole('Player')) {
-            ApplicationError("Permission", "You must be a player to leave a team!");
+            ApplicationError("Permission", "You must be a player to leave a team!", 403);
         }
         if (isset($this->Team_ID)) {
             ApplicationError("Team", "You must be part of a team before you can leave it.");

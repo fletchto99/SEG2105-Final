@@ -39,7 +39,7 @@ class Match extends Entity {
     public static function create($tournamentID, $nextMatchID = null, $teamAID = null, $teamBID = null) {
         $user = Person::user();
         if (!$user->hasRole('Organizer')) {
-            ApplicationError("Match", "You must be a tournament organizer to create a match!");
+            ApplicationError("Match", "You must be a tournament organizer to create a match!", 403);
         }
         if (!is_numeric($tournamentID)) {
             ApplicationError("Match", "A valid tournament is required to make a match!");
@@ -56,7 +56,7 @@ class Match extends Entity {
     public function addGoal($player, $assister=null) {
         $user = Person::user();
         if (!$user->hasRole('Organizer')) {
-            ApplicationError("Match", "You must be a tournament organizer to add goals!");
+            ApplicationError("Match", "You must be a tournament organizer to add goals!", 403);
         }
         if ($this->Status != 1) {
             ApplicationError("Match", "A match must be in progress to add goals!");
@@ -73,7 +73,7 @@ class Match extends Entity {
     public function begin() {
         $user = Person::user();
         if (!$user->hasRole('Organizer')) {
-            ApplicationError("Match", "You must be a tournament organizer to begin a match!");
+            ApplicationError("Match", "You must be a tournament organizer to begin a match!", 403);
         }
         $tournament = Tournament::getTournament($this->Tournament_ID);
 
@@ -101,7 +101,7 @@ class Match extends Entity {
     public function end() {
         $user = Person::user();
         if (!$user->hasRole('Organizer')) {
-            ApplicationError("Match", "You must be a tournament organizer to begin a match!");
+            ApplicationError("Match", "You must be a tournament organizer to begin a match!", 403);
         }
         if ($this->Status != 1) {
             ApplicationError("Match", "A match must be in-progress to be finalized!");
