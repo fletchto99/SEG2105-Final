@@ -12,15 +12,14 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.CookieHandler;
-import java.net.CookieManager;
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class Data{
+public class Data {
 
     private static Data instance = null;
     private RequestQueue requestQueue;
@@ -32,10 +31,9 @@ public class Data{
     private static final String CONTROLLER_TYPE = ".php";
     private static final String LOGIN_CONTROLLER = "login";
     private static final String LOGOUT_CONTROLLER = "logout";
+    private static final String VALIDATE_CONTROLLER = "validate-session";
 
-    private Data(Context context){
-        CookieManager manager = new CookieManager();
-        CookieHandler.setDefault(manager);
+    private Data(Context context) {
         this.requestQueue = Volley.newRequestQueue(context.getApplicationContext());
     }
 
@@ -53,12 +51,41 @@ public class Data{
         return Data.instance;
     }
 
-    public void authenticate(final String username, final String password, final Response.Listener<String> listener, final WebErrorListener errorListener) {
-        String url = CONTROLLERS_ROOT+LOGIN_CONTROLLER+CONTROLLER_TYPE;
+    public void checkForAuthentication(final WebResponseListener listener, final WebErrorListener errorListener) {
+        String url = CONTROLLERS_ROOT + VALIDATE_CONTROLLER + CONTROLLER_TYPE;
         StringRequest request = new StringRequest(
                 Request.Method.GET,
                 url,
-                listener,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            listener.onResponse(new JSONObject(response));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                generateVolleyErrorListener(errorListener));
+
+        requestQueue.add(request);
+    }
+
+    public void authenticate(final String username, final String password, final WebResponseListener listener, final WebErrorListener errorListener) {
+        String url = CONTROLLERS_ROOT + LOGIN_CONTROLLER + CONTROLLER_TYPE;
+        StringRequest request = new StringRequest(
+                Request.Method.GET,
+                url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            listener.onResponse(new JSONObject(response));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
                 generateVolleyErrorListener(errorListener)) {
 
             @Override
@@ -70,25 +97,25 @@ public class Data{
         requestQueue.add(request);
     }
 
-    public void logout(final Response.Listener <JSONObject> listener, final WebErrorListener errorListener) {
-        String url = CONTROLLERS_ROOT+CONTROLLER_UPDATE+LOGOUT_CONTROLLER+CONTROLLER_TYPE;
-        requestQueue.add(new JsonObjectRequest(Request.Method.POST, url, null, listener, generateVolleyErrorListener(errorListener)));
+    public void logout() {
+        String url = CONTROLLERS_ROOT + CONTROLLER_UPDATE + LOGOUT_CONTROLLER + CONTROLLER_TYPE;
+        requestQueue.add(new JsonObjectRequest(Request.Method.POST, url, null, null, null));
 
     }
 
-    public void get(final JSONObject data, final String controller, final Response.Listener <JSONObject> listener, final WebErrorListener errorListener){
-        String url = CONTROLLERS_ROOT+CONTROLLER_GET+controller+CONTROLLER_TYPE;
-        requestQueue.add(new JsonObjectRequest(Request.Method.POST, url, data, listener, generateVolleyErrorListener(errorListener)));
+    public void get(final JSONObject data, final String controller, final WebResponseListener listener, final WebErrorListener errorListener) {
+        String url = CONTROLLERS_ROOT + CONTROLLER_GET + controller + CONTROLLER_TYPE;
+        requestQueue.add(new JsonObjectRequest(Request.Method.POST, url, data, generateVolleyResponseListener(listener), generateVolleyErrorListener(errorListener)));
     }
 
-    public void update(final JSONObject data, final String controller, final Response.Listener<JSONObject> listener, final WebErrorListener errorListener){
-        String url = CONTROLLERS_ROOT+CONTROLLER_UPDATE+controller+CONTROLLER_TYPE;
-        requestQueue.add(new JsonObjectRequest(Request.Method.POST, url, data, listener, generateVolleyErrorListener(errorListener)));
+    public void update(final JSONObject data, final String controller, final WebResponseListener listener, final WebErrorListener errorListener) {
+        String url = CONTROLLERS_ROOT + CONTROLLER_UPDATE + controller + CONTROLLER_TYPE;
+        requestQueue.add(new JsonObjectRequest(Request.Method.POST, url, data, generateVolleyResponseListener(listener), generateVolleyErrorListener(errorListener)));
     }
 
-    public void remove(final JSONObject data, final String controller, final Response.Listener<JSONObject>  listener, final WebErrorListener errorListener){
-        String url = CONTROLLERS_ROOT+CONTROLLER_REMOVE+controller+CONTROLLER_TYPE;
-        requestQueue.add(new JsonObjectRequest(Request.Method.POST, url, data, listener, generateVolleyErrorListener(errorListener)));
+    public void remove(final JSONObject data, final String controller, final WebResponseListener listener, final WebErrorListener errorListener) {
+        String url = CONTROLLERS_ROOT + CONTROLLER_REMOVE + controller + CONTROLLER_TYPE;
+        requestQueue.add(new JsonObjectRequest(Request.Method.POST, url, data, generateVolleyResponseListener(listener), generateVolleyErrorListener(errorListener)));
     }
 
     private Response.ErrorListener generateVolleyErrorListener(final WebErrorListener wel) {
@@ -96,8 +123,22 @@ public class Data{
             @Override
             public void onErrorResponse(VolleyError error) {
                 try {
-                    wel.onError(new JSONObject(new String(error.networkResponse.data, "utf-8")));
-                } catch ( Exception e ) {
+                    wel.onError(new JSONObject(new String(error.networkResponse.data, "utf-8")).getJSONObject("error"));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //TODO: Handle errors not generated by the conroller?
+                }
+            }
+        };
+    }
+
+    private Response.Listener<JSONObject> generateVolleyResponseListener(final WebResponseListener rel) {
+        return new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    rel.onResponse(response);
+                } catch (Exception e) {
                     e.printStackTrace();
                     //TODO: Handle errors not generated by the conroller?
                 }

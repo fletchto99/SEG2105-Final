@@ -10,7 +10,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.tempname.keeper.MainActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -18,9 +18,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.tempname.keeper.MainScreenActivity"
+            android:name=".activities.MainScreenActivity"
             android:label="@string/title_activity_main_screen"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activities.LoginActivity" />
+        <activity android:name=".activities.CreateAccountActivity"></activity>
     </application>
 
 </manifest>

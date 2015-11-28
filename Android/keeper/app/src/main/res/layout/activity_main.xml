@@ -6,24 +6,36 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context="com.tempname.keeper.MainActivity">
 
-    <TextView
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/txtDisplay"
-        android:layout_alignParentTop="true"
+        android:text="@string/create"
+        android:id="@+id/buttonCreateAccount"
+        android:layout_marginBottom="63dp"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:layout_above="@+id/getTxt"
-        android:freezesText="true"/>
+        android:onClick="createAccount"
+        android:visibility="invisible" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create Account"
-        android:id="@+id/getTxt"
-        android:onClick="getText"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true" />
+        android:text="@string/login"
+        android:id="@+id/buttonLogin"
+        android:layout_above="@+id/buttonCreateAccount"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:onClick="login"
+        android:visibility="invisible" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/app_name"
+        android:id="@+id/textView2"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="124dp" />
 </RelativeLayout>

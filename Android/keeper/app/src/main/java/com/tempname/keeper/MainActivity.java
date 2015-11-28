@@ -1,102 +1,89 @@
 package com.tempname.keeper;
 
-import android.content.Context;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.TextView;
 
+import com.github.franmontiel.PersistentCookieStore;
+import com.tempname.keeper.activities.CreateAccountActivity;
+import com.tempname.keeper.activities.LoginActivity;
+import com.tempname.keeper.activities.MainScreenActivity;
 import com.tempname.keeper.data.Data;
 import com.tempname.keeper.data.WebErrorListener;
+import com.tempname.keeper.data.WebResponseListener;
 import com.tempname.keeper.util.Notification;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static com.android.volley.Response.Listener;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final int FINISH_ACTIVITY = 1;
+
+    private final Activity self = this;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        //Load any saved sessions
+        final CookieManager manager = new CookieManager(new PersistentCookieStore(getApplicationContext()), CookiePolicy.ACCEPT_ALL);
+        CookieHandler.setDefault(manager);
+
+        //Init the data singleton
+        Data.createInstance(this);
+
+        //Display the view
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Data.createInstance(this);
-    }
 
-    public void getText(View view) {
-
-        final TextView text = (TextView) findViewById(R.id.txtDisplay);
-        final Context self = this;
-        Data.getInstance().authenticate("matt", "tsest", null, new WebErrorListener() {
-            @Override
-            public void onError(JSONObject error) {
-                Notification.displayError(self, "Aww she don't work");
-            }
-        });
-
-        JSONObject data = new JSONObject();
-        try {
-            data.put("Jersey_Number", "12");
-
-            //The endpoint which we are targeting
-            String controller = "player-number";
-
-            //How to handle an error when the endpoint generates on
-            WebErrorListener errorListener2 = new WebErrorListener() {
-                @Override
-                public void onError(JSONObject error) {
-                    text.setText(error.toString());
-                }
-            };
-
-            Listener<JSONObject> listener2= new Listener<JSONObject>() {
-
-                public void onResponse(JSONObject response) {
-                    text.setText(response.toString());
-                }
-            };
-
-            Data.getInstance().update(data, controller, listener2, errorListener2);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (manager.getCookieStore().getCookies().size() > 0) {
+            Notification.displayNotification(this, "Attempting to log in...");
+            Data.getInstance().checkForAuthentication(
+                    new WebResponseListener() {
+                        @Override
+                        public void onResponse(JSONObject response) throws JSONException {
+                            Notification.displaySuccessMessage(self, response.getString("success"));
+                            self.startActivity(new Intent(self, MainScreenActivity.class));
+                            self.finish();
+                        }
+                    }, new WebErrorListener() {
+                        @Override
+                        public void onError(JSONObject error) throws JSONException {
+                            Notification.displayError(self, error.getString("message"));
+                            Data.getInstance().logout();
+                            manager.getCookieStore().removeAll();
+                            findViewById(R.id.buttonLogin).setVisibility(View.VISIBLE);
+                            findViewById(R.id.buttonCreateAccount).setVisibility(View.VISIBLE);
+                        }
+                    });
+        } else {
+            findViewById(R.id.buttonLogin).setVisibility(View.VISIBLE);
+            findViewById(R.id.buttonCreateAccount).setVisibility(View.VISIBLE);
         }
 
+    }
 
-//        JSONObject data = new JSONObject();
-//        try {
-//
-//            //TODO: Replace with form data instead of hardcoded values
-//            data.put("Username", "Example3");
-//            data.put("Password", "Example3");
-//            data.put("First_Name", "Matt");
-//            data.put("Last_Name", "Langlois");
-//
-//            //The endpoint which we are targeting
-//            String controller = "create-user";
-//
-//            //How to handle an error when the endpoint generates on
-//            WebErrorListener errorListener = new WebErrorListener() {
-//                @Override
-//                public void onError(JSONObject error) {
-//                    text.setText(error.toString());
-//                }
-//            };
-//
-//            Listener<JSONObject> listener= new Listener<JSONObject>() {
-//
-//                public void onResponse(JSONObject response) {
-//                    text.setText(response.toString());
-//                }
-//            };
-//
-//            Data.getInstance(this).update(data, controller, listener, errorListener);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-
-
+    public void login(View view) {
+        startActivityForResult(new Intent(this, LoginActivity.class), FINISH_ACTIVITY);
     }
 
 
+    public void createAccount(View view) {
+        startActivityForResult(new Intent(this, CreateAccountActivity.class), FINISH_ACTIVITY);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == FINISH_ACTIVITY) {
+            if (resultCode == RESULT_OK) {
+                this.finish();
+            }
+        }
+    }
 }
