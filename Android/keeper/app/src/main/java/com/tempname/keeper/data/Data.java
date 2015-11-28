@@ -1,4 +1,4 @@
-package com.name.temp.keeper.Data;
+package com.tempname.keeper.data;
 
 import android.content.Context;
 import android.util.Base64;
@@ -14,6 +14,8 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
 
+import java.net.CookieHandler;
+import java.net.CookieManager;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +34,8 @@ public class Data{
     private static final String LOGOUT_CONTROLLER = "logout";
 
     private Data(Context context){
+        CookieManager manager = new CookieManager();
+        CookieHandler.setDefault(manager);
         this.requestQueue = Volley.newRequestQueue(context.getApplicationContext());
     }
 

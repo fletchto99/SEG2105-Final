@@ -1,4 +1,4 @@
-package com.name.temp.keeper.Data;
+package com.tempname.keeper.data;
 
 import org.json.JSONObject;
 
