@@ -1,5 +1,6 @@
 <?php
 /**
+ * No required parameters
  * [optional] Takes a deleted parameter, if true it will include deleted tournaments
  *
  * Returns the id's of all of the tournaments (open, current, and past)

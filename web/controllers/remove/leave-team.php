@@ -1,6 +1,6 @@
 <?php
 /**
- * Takes a team id
+ * Takes no parameters
  *
  * Checks if the current user is the coach or an organizer, if so it removes all players from the team (making them a free agent) and marks the team as deleted
  */

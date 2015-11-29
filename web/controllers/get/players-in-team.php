@@ -1,6 +1,6 @@
 <?php
 /**
- * Takes a teamID
+ * Takes a Team_ID
  *
  * Returns all of the player's in the team
  */

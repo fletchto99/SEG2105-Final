@@ -1,7 +1,7 @@
 <?php
 /*
- * Takes match ID
- * Takes player ID
+ * Takes Match_ID
+ * Takes Player_ID
  *
  * Uses player id to determine team and then adds a goal to that player
  * for the specific tournament that the match is in (only if the match is in progress)

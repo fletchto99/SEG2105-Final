@@ -1,7 +1,7 @@
 <?php
 /**
- * Takes a tournament name
- * Takes a tournament description
+ * Takes a Tournament_Name
+ * Takes a Tournament_Type (id, 0[K], 1[RR], 2[KRR])
  *
  * Adds the tournament to the database and sets it to the planning phase
  *

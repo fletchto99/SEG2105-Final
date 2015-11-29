@@ -1,6 +1,10 @@
 <?php
 /*
  *
+ * Takes First_Name
+ * Takes Last_Name
+ * Takes Jersey_Number
+ *
  * Inserts a player into the database
  *
  * returns the player's information

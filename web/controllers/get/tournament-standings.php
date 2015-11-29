@@ -1,6 +1,6 @@
 <?php
 /**
- * Takes a tournamentID
+ * Takes a Tournament_ID
  *
  * !!!!Based on tournament type!!!!
  * Returns tournament type plus one of the following cases

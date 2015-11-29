@@ -1,7 +1,7 @@
 <?php
 /**
- * Takes a teamID
- * Takes a team Name
+ * Takes a Team_ID
+ * Takes a Team_Name
  *
  * update the team name
  *

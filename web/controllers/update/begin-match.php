@@ -1,6 +1,6 @@
 <?php
 /**
- * Takes a matchID
+ * Takes a Match_ID
  *
  * Update's sets the match as in-progress if it has not started, or finished.
  *

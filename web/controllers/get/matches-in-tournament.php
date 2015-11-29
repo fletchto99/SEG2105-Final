@@ -1,6 +1,6 @@
 <?php
 /**
- * Takes a tournament ID
+ * Takes a Tournament_ID
  *
  * Returns the matches to occur for the specific tournament
  */

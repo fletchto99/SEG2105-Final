@@ -1,6 +1,6 @@
 <?php
 /**
- * Takes a tournamentID
+ * Takes a Tournament_ID
  *
  * Returns all of the teams who have entered the tournament
  */

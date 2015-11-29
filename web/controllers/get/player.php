@@ -1,6 +1,6 @@
 <?php
 /**
- * Takes a Person ID
+ * Takes a Person_ID
  *
  * Returns all of the player information including their total goals scored, tournaments participated in and their team
  */

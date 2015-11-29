@@ -1,6 +1,10 @@
 <?php
 /**
- * Requires a username and a password
+ * Takes a Username
+ * Takes a Password
+ * Takes a First_Name
+ * Takes a Last_Name
+ * [Optional] Takes a Jersey_Number
  *
  * Inserts a user into the database and opens a session for them
  *

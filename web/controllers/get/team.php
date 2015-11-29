@@ -1,6 +1,6 @@
 <?php
 /**
- * Takes a TeamID
+ * Takes a Team_ID
  *
  * Returns the team's information (logo, name, coachID)
  */

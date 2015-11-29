@@ -1,7 +1,7 @@
 <?php
 /**
+ * Takes a Jersey_Number
  * [optional] Takes a person_ID
- * Takes a  number
  *
  * updates the players number
  *

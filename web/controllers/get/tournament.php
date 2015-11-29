@@ -1,6 +1,6 @@
 <?php
 /**
- * Takes a tournament id
+ * Takes a Tournament_ID
  *
  * Returns the information of the tournament
  */

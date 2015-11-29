@@ -1,6 +1,6 @@
 <?php
 /**
- * Takes a match ID
+ * Takes a Match_ID
  *
  * Returns the status of the match, the team ID's of the team's participating, and the scores
  */

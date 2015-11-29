@@ -1,6 +1,6 @@
 <?php
 /**
- * Takes: Tournament id
+ * Takes: Tournament_ID
  *
  * Checks if the current user is an organizer and then deletes the tournament (Only if it is in the planning phase!)
  */

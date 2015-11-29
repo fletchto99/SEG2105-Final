@@ -1,6 +1,6 @@
 <?php
 /**
- * Takes a tournamentID
+ * Takes a Tournament_ID
  *
  * Update's sets the tournament as over.
  *

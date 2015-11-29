@@ -1,7 +1,7 @@
 <?php
 /**
- * Takes a Team ID
- * [Optional] Takes a player ID
+ * Takes a Team_ID
+ * [Optional] Takes a Player_ID
  *
  * Adds that player to the team roster
  */

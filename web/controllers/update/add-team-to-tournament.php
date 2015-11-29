@@ -1,7 +1,7 @@
 <?php
 /**
- * Takes a tournament ID
- * Takes a team ID
+ * Takes a Tournament_ID
+ * Takes a Team_ID
  *
  * Checks if the tournament is in the planning phase (i.e. not started) and adds that team to the tournament roster
  *
