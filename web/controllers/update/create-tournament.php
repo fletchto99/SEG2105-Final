@@ -13,6 +13,6 @@ authenticate();
 
 $tournament = new Tournament();
 $tournament->fromJSON();
-$tournament->checkKeys(['Tournament_Name']);
+$tournament->checkKeys(['Tournament_Name', 'Tournament_Type']);
 $result = $tournament->create();
 echo $result->toJSON();

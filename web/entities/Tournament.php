@@ -52,11 +52,15 @@ class Tournament extends Entity {
             ApplicationError('Team', 'Unable to create team, user is already a member of a team!');
         }
 
+        if ($this->Tournament_Type || ($this->Tournament_Type < 0 || $this->Tournament_Type > 2)) {
+            ApplicationError("Tournament", "The tournament must be of value 0 (Knock Out), 1 (Round Robin) or 2(Knock out round robin)!");
+        }
+
         $dbh = Database::getInstance();
-        $sql = "INSERT INTO Tournaments(Tournament_Name, Tournament_Organizer_ID)
-                Values(?,?)";
+        $sql = "INSERT INTO Tournaments(Tournament_Name, Tournament_Organizer_ID, Tournament_Type)
+                Values(?,?,?)";
         $sth = $dbh->prepare($sql);
-        $sth->execute([$this->Tournament_Name, $user->Person_ID]);
+        $sth->execute([$this->Tournament_Name, $user->Person_ID, $this->Tournament_Type]);
         return self::getTournament($dbh->lastInsertId());
     }
 
@@ -139,7 +143,7 @@ class Tournament extends Entity {
         $sth->execute([$this->Tournament_ID]);
     }
 
-    public function begin($Tournament_Type) {
+    public function begin() {
         $user = Person::user();
         if (!$user->hasRole('Organizer')) {
             ApplicationError("Permissions", "You must be an organizer to start a tournament!", 403);
@@ -148,9 +152,6 @@ class Tournament extends Entity {
             ApplicationError("Tournament", "A tournament must be in the planning phase to be started!");
         }
 
-        if (!is_numeric($Tournament_Type) || (intval($Tournament_Type) < 0 || intval($Tournament_Type) > 2)) {
-            ApplicationError("Tournament", "The tournament must be of value 0 (Knock Out), 1 (Round Robin) or 2(Knock out round robin)!");
-        }
         $teams = $this->getTeams()->Teams;
         $numRegistered = sizeof($teams);
 
@@ -158,7 +159,11 @@ class Tournament extends Entity {
             ApplicationError("Tournament", "You need at least 2 teams registered before the tournament can begin!");
         }
 
-        if (($Tournament_Type == 0 || $Tournament_Type == 2) && ($numRegistered & ($numRegistered - 1) != 0)) {
+        if ($this->Tournament_Type) {
+            ApplicationError("Tournament","A tournament requires a valid type before it can begin!");
+        }
+
+        if (($this->Torunament_Type == 0 || $this->Tournament_Type == 2) && ($numRegistered & ($numRegistered - 1) != 0)) {
 
             $numRequired = $numRegistered - 1;//Subtract 1 to handle the case that we are already a power of 2
             $numRequired |= $numRequired >> 1;//shift all bits to 1
@@ -170,7 +175,7 @@ class Tournament extends Entity {
 
             ApplicationError("Tournament", "You n^2 teams to perform a knockout style tournament! That means you need {$numRequired} more teams!");
         }
-        if ($Tournament_Type == 0) {
+        if ($this->Tournament_Type == 0) {
             if ($numRegistered > 2) {
                 $matches = [];
                 array_push($matches, Match::create($this->Tournament_ID));
@@ -188,7 +193,7 @@ class Tournament extends Entity {
             } else {
                 Match::create($this->Tournament_ID, null, $teams[0]->Team_ID, $teams[1]->Team_ID);
             }
-        } else if ($Tournament_Type == 1) {
+        } else if ($this->Tournament_Type == 1) {
             $matches = [];
             $teamsRotated = $teams;
             if (sizeof($teamsRotated)%2!=0) {
@@ -206,7 +211,7 @@ class Tournament extends Entity {
             foreach($matches as $match) {
                 Match::create($this->Tournamnet_ID, null, $match['Team_A_ID'], $match['Team_B_ID']);
             }
-        } else if($Tournament_Type) {
+        } else if($this->Tournament_Type) {
             //TODO: Implement krr tournament type
             ApplicationError("Matches", "This tournament type is not yet implemented! Sorry!");
         }
