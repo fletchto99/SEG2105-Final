@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `Persons` (
   `First_Name` varchar(30) NOT NULL DEFAULT '',
   `Last_Name` varchar(30) NOT NULL DEFAULT '',
   `Jersey_Number` int(2) DEFAULT NULL,
-  `Avatar` varchar(255) DEFAULT NULL,
+  `Person_Avatar` int(10) DEFAULT NULL,
   `Role_ID` int(10) unsigned NOT NULL,
   `Team_ID` int(10) unsigned DEFAULT NULL,
   `Last_Update_Date_Time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

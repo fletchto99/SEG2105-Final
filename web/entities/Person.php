@@ -19,7 +19,7 @@ class Person extends Entity {
 
         $dbh = Database::getInstance();
         $sql =
-            "SELECT p.Person_ID, p.First_Name, p.Last_Name, p.Jersey_Number, p.Avatar, p.Team_ID, r.Role_Name
+            "SELECT p.Person_ID, p.First_Name, p.Last_Name, p.Jersey_Number, p.Person_Avatar, p.Team_ID, r.Role_Name
              FROM Persons p
                 INNER JOIN Roles r ON r.Role_ID = p.Role_ID
              WHERE p.Person_ID = ?";
@@ -308,6 +308,28 @@ class Person extends Entity {
         }
 
         return $this;
+    }
+
+    public function updateAvatar($Person_Avatar) {
+
+        if (!is_numeric($Person_Avatar)) {
+            ApplicationError("Avatar", "The avatar id must be a valid integer!");
+        }
+
+        $number = intval($Person_Avatar);
+
+        if ($Person_Avatar == $this->$Person_Avatar) {
+            ApplicationError("Number", "{$number} is already your avatar!");
+        }
+
+        $sql = "UPDATE Persons
+                SET Person_Avatar=?
+                WHERE Person_ID=?";
+        $dbh = Database::getInstance();
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$Person_Avatar, $this->Person_ID]);
+        $this->Person_Avatar = $Person_Avatar;
+        return new Entity(['Success'=>"Player avatar changed to {$Person_Avatar}"]);
     }
 
 }

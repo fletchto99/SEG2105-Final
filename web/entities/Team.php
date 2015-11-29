@@ -75,13 +75,23 @@ class Team extends Entity {
         return new Entity(['success'=>'Team successfully created!']);
     }
 
-    public function updateAvatar() {
-
+    public function updateAvatar($Team_Avatar) {
+        $user = Person::user();
+        if ($user->Person_ID != $this->Captain_ID && !$user->hasRole('Organizer')) {
+            ApplicationError("Team", "You must be the team captain or an event organizer to rename a team!", 403);
+        }
+        $sql = "UPDATE Teams
+                SET Team_Avatar=?
+                WHERE Team_ID=?";
+        $dbh = Database::getInstance();
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$Team_Avatar, $this->Team_ID]);
+        return new Entity(['success'=>"Team avatar updated to {$this->Team_Avatar}"]);
     }
 
     public function updateName($Team_Name) {
         $user = Person::user();
-        if ($user->Person_ID != $this->Captain_ID || !$user->hasRole('Organizer')) {
+        if ($user->Person_ID != $this->Captain_ID && !$user->hasRole('Organizer')) {
             ApplicationError("Team", "You must be the team captain or an event organizer to rename a team!", 403);
         }
         $sql = "UPDATE Teams
@@ -189,6 +199,18 @@ class Team extends Entity {
             }
         }
         return true;
+    }
+
+    public static function getTeams() {
+        $dbh = Database::getInstance();
+        $result = new Entity();
+        $sql = "SELECT Team_ID, Team_Name
+                FROM Teams
+                WHERE Deleted = 0";
+        $sth = $dbh->prepare($sql);
+        $sth->execute();
+        $result->addToData(['Teams'=>$sth->fetchAll()]);
+        return $result;
     }
 
 }
