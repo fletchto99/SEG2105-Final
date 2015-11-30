@@ -15,4 +15,5 @@
     <string name="lastname">Last Name</string>
     <string name="successfully_loggedin">You have been logged in successfully!</string>
     <string name="logout">Logout</string>
+    <string name="error_loading_name">Error loading profile!</string>
 </resources>

@@ -38,7 +38,6 @@ public class CreateAccountActivity extends Activity {
                     new WebResponseListener() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            Notification.displaySuccessMessage(self, getString(R.string.successfully_loggedin));
                             Intent intent = new Intent(self, MainScreenActivity.class);
                             intent.putExtra("AccountData", response.toString());
                             startActivity(intent);

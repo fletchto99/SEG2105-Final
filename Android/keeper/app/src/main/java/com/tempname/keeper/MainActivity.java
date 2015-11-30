@@ -31,16 +31,24 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        //Load any saved sessions
-        final CookieManager manager = new CookieManager(new PersistentCookieStore(getApplicationContext()), CookiePolicy.ACCEPT_ALL);
-        CookieHandler.setDefault(manager);
+        if (!Data.isReady()) {
+            //Load any saved sessions
+            final CookieManager manager = new CookieManager(new PersistentCookieStore(getApplicationContext()), CookiePolicy.ACCEPT_ALL);
+            CookieHandler.setDefault(manager);
 
-        //Init the data singleton
-        Data.createInstance(this);
+            //Init the data singleton
+            Data.createInstance(this);
+        }
 
         //Display the view
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        final CookieManager manager = (CookieManager)CookieHandler.getDefault();
+
+        if (getIntent().getBooleanExtra("logout", false)) {
+            manager.getCookieStore().removeAll();
+        }
 
         if (manager.getCookieStore().getCookies().size() > 0) {
             Notification.displayNotification(this, "Attempting to log in...");
@@ -48,8 +56,9 @@ public class MainActivity extends AppCompatActivity {
                     new WebResponseListener() {
                         @Override
                         public void onResponse(JSONObject response) throws JSONException {
-                            Notification.displaySuccessMessage(self, response.getString("success"));
-                            self.startActivity(new Intent(self, MainScreenActivity.class));
+                            Intent intent = new Intent(self, MainScreenActivity.class);
+                            intent.putExtra("AccountData", response.toString());
+                            self.startActivity(intent);
                             self.finish();
                         }
                     }, new WebErrorListener() {

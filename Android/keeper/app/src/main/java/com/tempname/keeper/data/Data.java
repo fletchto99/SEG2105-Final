@@ -51,6 +51,10 @@ public class Data {
         return Data.instance;
     }
 
+    public static synchronized boolean isReady() {
+        return Data.instance != null;
+    }
+
     public void checkForAuthentication(final WebResponseListener listener, final WebErrorListener errorListener) {
         String url = CONTROLLERS_ROOT + VALIDATE_CONTROLLER + CONTROLLER_TYPE;
         StringRequest request = new StringRequest(
