@@ -13,4 +13,6 @@
     <string name="username">Username</string>
     <string name="firstname">First Name</string>
     <string name="lastname">Last Name</string>
+    <string name="successfully_loggedin">You have been logged in successfully!</string>
+    <string name="logout">Logout</string>
 </resources>

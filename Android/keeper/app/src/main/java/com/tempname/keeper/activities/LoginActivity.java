@@ -33,8 +33,10 @@ public class LoginActivity extends Activity {
                 new WebResponseListener() {
                     @Override
                     public void onResponse(JSONObject response) throws JSONException {
-                        Notification.displaySuccessMessage(self, response.getString("success"));
-                        self.startActivity(new Intent(self, MainScreenActivity.class));
+                        Notification.displaySuccessMessage(self, getString(R.string.successfully_loggedin));
+                        Intent intent = new Intent(self, MainScreenActivity.class);
+                        intent.putExtra("AccountData", response.toString());
+                        self.startActivity(intent);
                         self.setResult(RESULT_OK);
                         self.finish();
                     }
