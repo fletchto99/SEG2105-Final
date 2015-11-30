@@ -1,5 +1,6 @@
 package com.tempname.keeper.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -15,6 +16,9 @@ import android.widget.TextView;
 
 import com.tempname.keeper.MainActivity;
 import com.tempname.keeper.R;
+import com.tempname.keeper.data.Data;
+import com.tempname.keeper.data.WebErrorListener;
+import com.tempname.keeper.data.WebResponseListener;
 import com.tempname.keeper.util.Notification;
 import com.tempname.keeper.wrappers.Account;
 
@@ -24,6 +28,10 @@ import org.json.JSONObject;
 public class MainScreenActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private Account person = null;
+
+    private static final int REQUEST_UPDATE_PROFILE = 1;
+
+    private Activity self = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +67,6 @@ public class MainScreenActivity extends AppCompatActivity implements NavigationV
             loginError();
         }
 
-
     }
 
     private void loginError() {
@@ -68,6 +75,10 @@ public class MainScreenActivity extends AppCompatActivity implements NavigationV
         welcomeScreen.putExtra("logout", true);
         startActivity(welcomeScreen);
         this.finish();
+    }
+
+    private void updateJerseyNumberHeader() {
+        ((TextView) findViewById(R.id.jerseyNumberText)).setText(String.format("Number %s", person.getJerseyNumber()));
     }
 
     @Override
@@ -85,7 +96,7 @@ public class MainScreenActivity extends AppCompatActivity implements NavigationV
         ((TextView) findViewById(R.id.personNameText)).setText(String.format("%s %s", person.getFirsName(), person.getLastName()));
 
         if (person.getRole().equalsIgnoreCase("Player")) {
-            ((TextView) findViewById(R.id.jerseyNumberText)).setText(String.format("Number %s", person.getJerseyNumber()));
+            updateJerseyNumberHeader();
         }
 
         return true;
@@ -108,7 +119,38 @@ public class MainScreenActivity extends AppCompatActivity implements NavigationV
         return true;
     }
 
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_UPDATE_PROFILE) {
+            if (resultCode == RESULT_OK) {
+                String newNumber = data.getStringExtra("Jersey_Number");
+                if (!person.getJerseyNumber().equals(newNumber) && person.getRole().equalsIgnoreCase("Player")) {
+                    person.setJerseyNumber(newNumber);
+                    updateJerseyNumberHeader();
+                    JSONObject newNumberData = new JSONObject();
+                    try {
+                        newNumberData.put("Jersey_Number", newNumber);
+                        Data.getInstance().update(newNumberData, "player-number", null,
+                                new WebErrorListener() {
+                                    @Override
+                                    public void onError(JSONObject error) throws JSONException {
+                                        Notification.displayError(self, error.getString("message"));
+                                    }
+                                });
+                    } catch (JSONException e) {
+                        Notification.displayError(this, "There was an error syncing your jersey number with the cloud!");
+                    }
+
+                }
+            }
+        }
+    }
+
     public void modifyAccount(View view) {
-        System.out.println("Yup it worked");
+        Intent settings = new Intent(this, ProfileSettingsActivity.class);
+        settings.putExtra("Jersey_Number", person.getJerseyNumber());
+        settings.putExtra("Person_Avatar", person.getAvatar());
+        startActivityForResult(settings, REQUEST_UPDATE_PROFILE);
     }
 }

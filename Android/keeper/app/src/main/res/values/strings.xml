@@ -16,4 +16,8 @@
     <string name="successfully_loggedin">You have been logged in successfully!</string>
     <string name="logout">Logout</string>
     <string name="error_loading_name">Error loading profile!</string>
+    <string name="avatar_selection">Select avatar</string>
+    <string name="save_profile">Save Profile</string>
+    <string name="profile_settings">Profile Settings</string>
+    <string name="jerseyNumber">Jersey Number</string>
 </resources>

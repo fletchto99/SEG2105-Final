@@ -38,7 +38,7 @@ public class Account implements Serializable {
         return jerseyNumber;
     }
 
-    public String avatar() {
+    public String getAvatar() {
         return avatar;
     }
 
@@ -48,6 +48,18 @@ public class Account implements Serializable {
 
     public String getRole() {
         return role;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setJerseyNumber(String jerseyNumber) {
+        this.jerseyNumber = jerseyNumber;
     }
 
 }

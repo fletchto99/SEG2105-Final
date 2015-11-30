@@ -22,7 +22,8 @@
             android:label="@string/title_activity_main_screen"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activities.LoginActivity" />
-        <activity android:name=".activities.CreateAccountActivity"></activity>
+        <activity android:name=".activities.CreateAccountActivity" />
+        <activity android:name=".activities.ProfileSettingsActivity"></activity>
     </application>
 
 </manifest>

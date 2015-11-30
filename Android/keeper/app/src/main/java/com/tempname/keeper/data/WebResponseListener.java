@@ -5,5 +5,5 @@ import org.json.JSONObject;
 
 public interface WebResponseListener {
 
-    void onResponse(JSONObject error) throws JSONException;
+    void onResponse(JSONObject response) throws JSONException;
 }
