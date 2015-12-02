@@ -1,25 +1,15 @@
 package com.tempname.keeper.activities;
 
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
 import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.tempname.keeper.R;
-import com.tempname.keeper.data.Data;
-import com.tempname.keeper.data.WebErrorListener;
-import com.tempname.keeper.data.WebResponseListener;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class TournamentsActivity extends Activity {
 
