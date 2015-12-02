@@ -30,17 +30,6 @@ public class NewTeamActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_team);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
     }
 
     public void OnSetAvatarButton(View view) {
@@ -49,8 +38,8 @@ public class NewTeamActivity extends AppCompatActivity {
     }
 
     public void OnCancel(View view) {
-        Intent intent = new Intent(getApplicationContext(), MainScreenActivity.class); //Application Context and Activity
-        startActivityForResult(intent, 0);
+        setResult(RESULT_CANCELED);
+        finish();
     }
 
     public void createTeam(View view) {
@@ -103,7 +92,6 @@ public class NewTeamActivity extends AppCompatActivity {
         }
     }
 
-
     //Q: Assuming that this method is called right after the display picture is chosen from the "EditDisplayPictureActivity"?
     //(code from lab)
     @Override
@@ -128,9 +116,6 @@ public class NewTeamActivity extends AppCompatActivity {
                 break;
             case R.id.img5:
                 drawableName = "ic_logo_05";
-                break;
-            case R.id.img6:
-                drawableName = "ic_logo_00";
                 break;
             default:
                 drawableName = "ic_menu_gallery";

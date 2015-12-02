@@ -117,6 +117,9 @@ public class MainScreenActivity extends AppCompatActivity implements NavigationV
             welcomeScreen.putExtra("logout", true);
             startActivity(welcomeScreen);
             this.finish();
+        }else if(id == R.id.nav_Team){
+            Intent intent = new Intent(this, TeamActivity.class);
+            startActivityForResult(intent,0);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

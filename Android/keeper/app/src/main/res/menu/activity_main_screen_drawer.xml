@@ -5,5 +5,8 @@
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_menu_logout"
             android:title="@string/logout" />
+        <item
+            android:id="@+id/nav_Team"
+            android:title="Teams"/>
     </group>
 </menu>

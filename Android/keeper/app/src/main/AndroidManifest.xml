@@ -23,6 +23,9 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activities.LoginActivity" />
         <activity android:name=".activities.CreateAccountActivity" />
+        <activity android:name=".activities.NewTeamActivity"/>
+        <activity android:name=".activities.EditDisplayPictureActivity"/>
+        <activity android:name=".activities.TeamActivity"/>
         <activity android:name=".activities.PlayerProfileSettingsActivity"></activity>
     </application>
 
