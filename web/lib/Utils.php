@@ -18,6 +18,10 @@ class Utils {
         return $result + 1;
     }
 
+    public static function getPreviousPowerSquared($number) {
+        return Utils::getNextPowerSquared($number) >> 1;
+    }
+
     public static function isPowerOfTwo($number) {
         return ($number & ($number - 1) == 0);
     }

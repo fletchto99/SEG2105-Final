@@ -171,46 +171,65 @@ class Tournament extends Entity {
             ApplicationError("Tournament", "You n^2 teams to perform a knockout style tournament! That means you need {$numRequired} more teams!");
         }
         if ($this->Tournament_Type == 0) {
-            if ($numRegistered > 2) {
-                $matches = [];
-                array_push($matches, Match::create($this->Tournament_ID));
-                while (sizeof($matches) !== ($numRegistered / 4)) {
-                    $tmpMatches = [];
-                    foreach ($matches as $match) {
-                        array_push($matches, Match::create($this->Tournament_ID, $match->Match_ID));
-                        array_push($matches, Match::create($this->Tournament_ID, $match->Match_ID));
-                    }
-                    $matches = $tmpMatches;
-                }
-                for($i = 0; $i < sizeof($matches); $i++) {
-                    Match::create($this->Tournament_ID, $matches[$i]->Match_ID, $teams[2*$i]->Team_ID, $teams[(2 * $i)+1]->Team_ID);
-                }
-            } else {
-                Match::create($this->Tournament_ID, null, $teams[0]->Team_ID, $teams[1]->Team_ID);
-            }
+            $this->createKnockoutMatches($teams);
         } else if ($this->Tournament_Type == 1) {
-            $matches = [];
-            $teamsRotated = $teams;
-            if (sizeof($teamsRotated)%2!=0) {
-                array_push($teamsRotated, null);
-            }
-            $mid = sizeof($teamsRotated) / 2;
-            do {
-                for ($i = 0; $i < $mid; $i++) {
-                    if ($teamsRotated[$i] !== null && $teamsRotated[$i+$mid] !== null) {
-                        array_push($matches, ['Team_A_ID' => $teamsRotated[$i]->Team_ID, 'Team_B_ID' => $teamsRotated[$i + $mid]->Team_ID]);
-                    }
-                }
-                $teamsRotated = Utils::rotateArray($teamsRotated);
-            } while($teamsRotated !== $teams);
-            foreach($matches as $match) {
-                Match::create($this->Tournamnet_ID, null, $match['Team_A_ID'], $match['Team_B_ID']);
-            }
+            $this->createRoundRobinMatches($teams);
         } else if($this->Tournament_Type) {
-            //TODO: Implement krr tournament type
-            ApplicationError("Matches", "This tournament type is not yet implemented! Sorry!");
+            $this->createRoundRobinMatches($teams);
+            $this->createKnockoutMatches(Utils::getPreviousPowerSquared($numRegistered));
         }
 
+    }
+
+    private function createRoundRobinMatches($teams) {
+        $matches = [];
+        $teamsRotated = $teams;
+        if (sizeof($teamsRotated)%2!=0) {
+            array_push($teamsRotated, null);
+        }
+        $mid = sizeof($teamsRotated) / 2;
+        do {
+            for ($i = 0; $i < $mid; $i++) {
+                if ($teamsRotated[$i] !== null && $teamsRotated[$i+$mid] !== null) {
+                    array_push($matches, ['Team_A_ID' => $teamsRotated[$i]->Team_ID, 'Team_B_ID' => $teamsRotated[$i + $mid]->Team_ID]);
+                }
+            }
+            $teamsRotated = Utils::rotateArray($teamsRotated);
+        } while($teamsRotated !== $teams);
+        foreach($matches as $match) {
+            Match::create($this->Tournamnet_ID, null, $match['Team_A_ID'], $match['Team_B_ID']);
+        }
+    }
+
+    private function createKnockoutMatches($numBaseMatches, $teams = null) {
+        if ($teams !== null && $numBaseMatches !== sizeof($teams)) {
+            ApplicationError("Internal Error", "Size of teams doesn't match the amount of matches to create.");
+        }
+        if ($numBaseMatches > 2) {
+            $matches = [];
+            array_push($matches, Match::create($this->Tournament_ID));
+            while (sizeof($matches) !== ($numBaseMatches / 4)) {
+                $tmpMatches = [];
+                foreach ($matches as $match) {
+                    array_push($matches, Match::create($this->Tournament_ID, $match->Match_ID));
+                    array_push($matches, Match::create($this->Tournament_ID, $match->Match_ID));
+                }
+                $matches = $tmpMatches;
+            }
+            for($i = 0; $i < sizeof($matches); $i++) {
+                if ($teams !== null) {
+                    Match::create($this->Tournament_ID, $matches[$i]->Match_ID, $teams[2*$i]->Team_ID, $teams[(2 * $i)+1]->Team_ID);
+                } else {
+                    Match::create($this->Tournament_ID, $matches[$i]->Match_ID);
+                }
+            }
+        } else {
+            if ($teams !== null) {
+                Match::create($this->Tournament_ID, null, $teams[0]->Team_ID, $teams[1]->Team_ID);
+            } else {
+                Match::create($this->Tournament_ID);
+            }
+        }
     }
 
     public function getMatches() {

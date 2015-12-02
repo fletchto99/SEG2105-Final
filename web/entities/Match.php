@@ -119,7 +119,7 @@ class Match extends Entity {
         $goals_B = $sth->fetch();
 
         if ($goals_A['count'] == $goals_B['count']) {
-            ApplicationError('Match', "The match can't end in a tie! This is a tournament!");
+            ApplicationError('Match', "The match can't end in a tie! This is a tournament, one team must win!");
         }
 
         $winningTeamID = $goals_A > $goals_B ? $this->Team_A_ID : $this->Team_B_ID;
