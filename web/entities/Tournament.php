@@ -163,15 +163,10 @@ class Tournament extends Entity {
             ApplicationError("Tournament","A tournament requires a valid type before it can begin!");
         }
 
-        if (($this->Torunament_Type == 0 || $this->Tournament_Type == 2) && ($numRegistered & ($numRegistered - 1) != 0)) {
+        if (($this->Torunament_Type == 0 || $this->Tournament_Type == 2) && !Utils::isPowerOfTwo($numRegistered)) {
 
-            $numRequired = $numRegistered - 1;//Subtract 1 to handle the case that we are already a power of 2
-            $numRequired |= $numRequired >> 1;//shift all bits to 1
-            $numRequired |= $numRequired >> 2;//shift all bits to 1
-            $numRequired |= $numRequired >> 4;//shift all bits to 1
-            $numRequired |= $numRequired >> 8;//shift all bits to 1
-            $numRequired |= $numRequired >> 16;//Support up to 32bit integer or 0x8000_0000
-            $numRequired -= ($numRegistered-1);//Subtract our original
+            $numRequired = Utils::getNextPowerSquared($numRegistered);
+            $numRequired -= $numRegistered;
 
             ApplicationError("Tournament", "You n^2 teams to perform a knockout style tournament! That means you need {$numRequired} more teams!");
         }

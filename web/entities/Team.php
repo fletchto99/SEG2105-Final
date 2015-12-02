@@ -63,11 +63,13 @@ class Team extends Entity {
         }
 
 
+        $avatar = isset($this->Team_Avatar) ? $this->Team_Avatar : null;
+
         $dbh = Database::getInstance();
-        $sql = "INSERT INTO Teams(Team_Name, Captain_ID)
-                Values(?,?)";
+        $sql = "INSERT INTO Teams(Team_Name, Captain_ID, Team_Avatar)
+                Values(?,?,?)";
         $sth = $dbh->prepare($sql);
-        $sth->execute([$this->Team_Name, $user->Person_ID]);
+        $sth->execute([$this->Team_Name, $user->Person_ID, $this->Team_Avatar]);
 
         $teamID = $dbh->lastInsertId();
         $user->joinTeam(self::getTeam($teamID));

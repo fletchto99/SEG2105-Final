@@ -138,14 +138,15 @@ class Person extends Entity {
             }
         }
 
-        $sql = "INSERT INTO Persons(First_Name, Last_Name, Jersey_Number, Role_ID)
-                VALUES (?,?,?,?)";
+        $sql = "INSERT INTO Persons(First_Name, Last_Name, Jersey_Number, Parson_Avatar, Role_ID)
+                VALUES (?,?,?,?,?)";
         $sth = $dbh->prepare($sql);
 
         $jerseyNumber = (isset($this->Jersey_Number) ? $this->Jersey_Number : null);
+        $avatar = (isset($this->Person_Avatar) ? $this->Person_Avatar : null);
         $roleID = (isset($this->Role_ID) ? $this->Role_ID : 2);
 
-        $sth->execute([$this->First_Name, $this->Last_Name, $jerseyNumber, $roleID]);
+        $sth->execute([$this->First_Name, $this->Last_Name, $jerseyNumber, $avatar, $roleID]);
         $pid = $dbh->lastInsertId();
 
         if (!$personOnly) {
@@ -311,11 +312,6 @@ class Person extends Entity {
     }
 
     public function updateAvatar($Person_Avatar) {
-
-        if (!is_numeric($Person_Avatar)) {
-            ApplicationError("Avatar", "The avatar id must be a valid integer!");
-        }
-
         $number = intval($Person_Avatar);
 
         if ($Person_Avatar == $this->$Person_Avatar) {

@@ -14,7 +14,7 @@
 CREATE TABLE IF NOT EXISTS `Teams` (
   `Team_ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Team_Name` varchar(50) NOT NULL,
-  `Team_Avatar` int(10) DEFAULT NULL,
+  `Team_Avatar` varchar(50) DEFAULT NULL,
   `Last_Update_Datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Captain_ID` int(10) unsigned DEFAULT NULL,
   `Deleted` bit(11) NOT NULL DEFAULT b'0',

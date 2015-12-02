@@ -86,7 +86,7 @@ class Match extends Entity {
         }
 
         if(!isset($this->Team_A_ID) || !isset($this->Team_B_ID) || !is_numeric($this->Team_A_ID) || !is_numeric($this->Team_B_ID)) {
-            ApplicationError("Match", "Both teams must be set before a match can begin");
+            ApplicationError("Match", "Both teams must be set before a match can begin!");
         }
 
         $dbh = Database::getInstance();
