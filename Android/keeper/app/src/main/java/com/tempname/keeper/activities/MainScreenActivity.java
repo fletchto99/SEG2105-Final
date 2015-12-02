@@ -12,7 +12,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+<<<<<<< HEAD
+import android.content.Intent;
+=======
 import android.widget.TextView;
+>>>>>>> f516553b198c2caa136a03c9748f3e37b3fd312f
 
 import com.tempname.keeper.MainActivity;
 import com.tempname.keeper.R;
@@ -127,6 +131,18 @@ public class MainScreenActivity extends AppCompatActivity implements NavigationV
         return true;
     }
 
+<<<<<<< HEAD
+    public void viewTournaments(View view){
+        Intent intent = new Intent(getApplicationContext(),TournamentsActivity.class);
+        startActivityForResult(intent,0);
+    }
+
+    public void viewTeams(View view){
+        //Intent intent = new Intent(getApplicationContext(), TeamsActivity.class);
+        //startActivityForResult(intent, 0);
+    }
+
+=======
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -160,4 +176,5 @@ public class MainScreenActivity extends AppCompatActivity implements NavigationV
         settings.putExtra("Person_Avatar", person.getAvatar());
         startActivityForResult(settings, REQUEST_UPDATE_PROFILE);
     }
+>>>>>>> f516553b198c2caa136a03c9748f3e37b3fd312f
 }
