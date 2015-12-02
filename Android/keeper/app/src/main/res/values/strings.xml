@@ -13,6 +13,27 @@
     <string name="username">Username</string>
     <string name="firstname">First Name</string>
     <string name="lastname">Last Name</string>
+<<<<<<< HEAD
+    <string name="tournaments">Tournaments</string>
+    <string name="teams">Teams</string>
+    <string name="welcome">Welcome</string>
+    <string name="title_activity_tournaments">TournamentsActivity</string>
+    <string name="title_activity_teams">TeamsActivity</string>
+    <string name="title_activity_create_new_tournament">CreateNewTournamentActivity</string>
+    <string name="Return">Return</string>
+    <string name="title_activity_view_tournament">ViewTournamentActivity</string>
+    <string name="new_tournament">New Tournament</string>
+    <string name="enter_tournament_name">Enter Tournament Name:</string>
+    <string name="select_tournament_type">Select Tournament Type:</string>
+    <string name="cancel">Cancel</string>
+    <string name="create_tournament">Create Tournament</string>
+    <string name="round_robin">Round Robin</string>
+    <string name="knockout">Knockout</string>
+    <string name="combination">Round Robin and Knockout Combination</string>
+    <string name="tounament_name">Tournament Name</string>
+    <string name="start_tournament">Start Tournament</string>
+    <string name="current_teams">Current Teams</string>
+=======
     <string name="successfully_loggedin">You have been logged in successfully!</string>
     <string name="logout">Logout</string>
     <string name="error_loading_name">Error loading profile!</string>
@@ -26,4 +47,5 @@
     <string name="cancel">Cancel</string>
     <string name="Teams">Teams</string>
 
+>>>>>>> f516553b198c2caa136a03c9748f3e37b3fd312f
 </resources>

@@ -1,45 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".activities.MainScreenActivity"
-    tools:showIn="@layout/app_bar_main_screen">
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.tempname.keeper.activities.ViewTournamentActivity">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/welcome"
-        android:id="@+id/Welcome"
+        android:text="@string/current_teams"
+        android:id="@+id/CurrentTeams"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="50dp"
         android:layout_centerHorizontal="true" />
 
-    <Button
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:text="@string/tournaments"
-        android:id="@+id/Tournaments"
-        android:layout_gravity="center_horizontal"
-        android:onClick="viewTournaments"
-        android:layout_marginTop="250dp"
-        android:layout_centerHorizontal="true" />
+    <ListView
+        android:layout_width="fill_parent"
+        android:layout_height="250dp"
+        android:id="@+id/TeamList"
+        android:layout_marginTop="110dp" />
 
     <Button
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:text="@string/teams"
-        android:id="@+id/Teams"
+        android:text="@string/start_tournament"
+        android:id="@+id/StartTournament"
         android:layout_gravity="center_horizontal"
-        android:onClick="viewTeams"
+        android:layout_marginTop="400dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="300dp" />
+        android:onClick="startTournament"/>
+
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="@string/Return"
+        android:id="@+id/Return"
+        android:layout_marginTop="450dp"
+        android:layout_centerHorizontal="true"
+        android:onClick="returnToPrevious"/>
 
 </RelativeLayout>
