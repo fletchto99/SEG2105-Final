@@ -24,7 +24,7 @@ public class Data {
     private static Data instance = null;
     private RequestQueue requestQueue;
 
-    private static final String CONTROLLERS_ROOT = "https://fletchto99.com/other/sites/school/seg2105/controllers/";
+    private static final String CONTROLLERS_ROOT = "https://fletchto99.com/other/sites/school/seg2105/backend/controllers/";
     private static final String CONTROLLER_GET = "get/";
     private static final String CONTROLLER_UPDATE = "update/";
     private static final String CONTROLLER_REMOVE = "remove/";
