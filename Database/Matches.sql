@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS `Matches` (
   `Next_Match_ID` int(11) unsigned DEFAULT NULL,
   `Last_Update_Datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Status` int(11) NOT NULL DEFAULT '0',
+  `Round` int(10) NOT NULL DEFAULT NULL,
   PRIMARY KEY (`Match_ID`),
   KEY `Team_A_ID` (`Team_A_ID`),
   KEY `Team_B_ID` (`Team_B_ID`),
