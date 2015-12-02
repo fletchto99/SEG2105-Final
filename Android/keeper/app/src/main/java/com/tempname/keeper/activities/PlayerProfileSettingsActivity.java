@@ -8,15 +8,18 @@ import android.widget.EditText;
 
 import com.tempname.keeper.R;
 
-public class ProfileSettingsActivity extends Activity {
+public class PlayerProfileSettingsActivity extends Activity {
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile_settings);
-
-        ((EditText) this.findViewById(R.id.jerseyNumberInputProfileSettings)).setText(getIntent().getStringExtra("Jersey_Number"));
+        setContentView(R.layout.activity_player_profile_settings);
+        String extra = getIntent().getStringExtra("Jersey_Number");
+        //TODO: need to find a better way to manage nulls in the DB
+        if (!extra.equalsIgnoreCase("null")) {
+            ((EditText) this.findViewById(R.id.jerseyNumberInputProfileSettings)).setText(extra);
+        }
     }
 
     public void saveProfile(View view) {

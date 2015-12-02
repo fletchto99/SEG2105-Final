@@ -18,7 +18,6 @@ import com.tempname.keeper.MainActivity;
 import com.tempname.keeper.R;
 import com.tempname.keeper.data.Data;
 import com.tempname.keeper.data.WebErrorListener;
-import com.tempname.keeper.data.WebResponseListener;
 import com.tempname.keeper.util.Notification;
 import com.tempname.keeper.wrappers.Account;
 
@@ -78,7 +77,11 @@ public class MainScreenActivity extends AppCompatActivity implements NavigationV
     }
 
     private void updateJerseyNumberHeader() {
-        ((TextView) findViewById(R.id.jerseyNumberText)).setText(String.format("Number %s", person.getJerseyNumber()));
+        ((TextView) findViewById(R.id.jerseyNumberText)).setText(String.format("Number %s", person.getJerseyNumber().equalsIgnoreCase("null") ? "not set" : person.getJerseyNumber()));
+    }
+
+    private void updateRoleNameHeader() {
+        ((TextView) findViewById(R.id.jerseyNumberText)).setText(person.getRole());
     }
 
     @Override
@@ -97,6 +100,8 @@ public class MainScreenActivity extends AppCompatActivity implements NavigationV
 
         if (person.getRole().equalsIgnoreCase("Player")) {
             updateJerseyNumberHeader();
+        } else {
+            updateRoleNameHeader();
         }
 
         return true;
@@ -141,14 +146,13 @@ public class MainScreenActivity extends AppCompatActivity implements NavigationV
                     } catch (JSONException e) {
                         Notification.displayError(this, "There was an error syncing your jersey number with the cloud!");
                     }
-
                 }
             }
         }
     }
 
     public void modifyAccount(View view) {
-        Intent settings = new Intent(this, ProfileSettingsActivity.class);
+        Intent settings = new Intent(this, PlayerProfileSettingsActivity.class);
         settings.putExtra("Jersey_Number", person.getJerseyNumber());
         settings.putExtra("Person_Avatar", person.getAvatar());
         startActivityForResult(settings, REQUEST_UPDATE_PROFILE);

@@ -23,7 +23,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activities.LoginActivity" />
         <activity android:name=".activities.CreateAccountActivity" />
-        <activity android:name=".activities.ProfileSettingsActivity"></activity>
+        <activity android:name=".activities.PlayerProfileSettingsActivity"></activity>
     </application>
 
 </manifest>
