@@ -216,7 +216,7 @@ class Tournament extends Entity {
         if ($numTeams > 2) {
             $matches = [];
             $round = Utils::calculateNumRounds($numTeams);
-            array_push($matches, Match::create($this->Tournament_ID, null, 1));
+            array_push($matches, Match::create($this->Tournament_ID, null, $round));
             $round--;
             while (sizeof($matches) !== ($numTeams / 4)) {
                 $tmpMatches = [];
@@ -300,12 +300,66 @@ class Tournament extends Entity {
         if (intval($this->Status) === 0) {
             ApplicationError("Tournament", "A tournament must be started before the standings can be retrieved");
         }
-        $result = new Entity(['Tournament_ID'=>$this->Tournament_ID, 'Tournament_Type'=>$this->Tournamnet_Type]);
-
-        if ($this->Tournament_Type == 1) {
-            //TODO: Implement
+        $result = new Entity(['Tournament_ID'=>$this->Tournament_ID, 'Tournament_Type'=>$this->Tournament_Type]);
+        $dbh = Database::getInstance();
+        if ($this->Tournament_Type == 0) {
+            $result -> addToData(['knockout_matches'=>$this->calcKOStats()]);
+        } else if ($this->Tournament_Type == 1) {
+            $result->addToData(['roundrobin_matches' => $this->calcRRStats()]);
+        } else if ($this->Tournament_Type == 2) {
+            $result->addToData(['knockout_matches' => $this->calcKOStats()]);
+            $result->addToData(['roundrobin_matches' => $this->calcRRStats()]);
         }
         return $result;
+    }
+
+    private function calcRRStats() {
+        $dbh = Database::getInstance();
+        $teams = $this->getTeams()->Teams;
+        $standings = [];
+        foreach ($teams as $team) {
+            $data = new Entity();
+
+            $data->addToData(['Team_ID' => $team['Team_ID']]);
+
+            $sql = "SELECT COUNT(*) as Matches_Won
+                    FROM Matches
+                    WHERE Winning_Team_ID = ?
+                    AND Tournament_ID = ?
+                    AND Round IS NULL
+                    ORDER BY Round DESC";
+            $sth = $dbh->prepare($sql);
+            $sth->execute([$team['Team_ID'], $this->Tournament_ID]);
+            $data->addToData(['Matches_Won' => $sth->fetch()['Matches_Won']]);
+
+            $sql = "SELECT COUNT(*) as Matches_Played
+                    FROM Matches
+                    WHERE (Team_A_ID = ? OR Team_B_ID = ?)
+                    AND Tournament_ID = ?
+                    AND Round IS NULL
+                    ORDER BY Round DESC";
+            $sth = $dbh->prepare($sql);
+            $sth->execute([$team['Team_ID'], $team['Team_ID'], $this->Tournament_ID]);
+            $data->addToData(['Matches_Played' => $sth->fetch()['Matches_Played']]);
+            array_push($standings, $data);
+        }
+
+        usort($standings, function ($a, $b) {
+            return $b->Matches_Won - $a->Matches_Won;
+        });
+        return $standings;
+    }
+
+    private function calcKOStats() {
+        $dbh = Database::getInstance();
+        $sql = "SELECT Winning_Team_ID, Team_A_ID, Team_B_ID, Round
+                    FROM Matches
+                    WHERE Tournament_ID = ?
+                        AND Round IS NOT NULL
+                    ORDER BY Round DESC";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$this->Tournament_ID]);
+        return $sth->fetchAll();
     }
 
 }
