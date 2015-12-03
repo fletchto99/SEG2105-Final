@@ -5,5 +5,4 @@
 
 require_once __DIR__ . '/../bootstrap.php';
 
-$person = Person::user();
-echo $person->toJSON();
+echo Person::user()->toJSON();

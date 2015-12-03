@@ -74,8 +74,10 @@ class Person extends Entity {
             $sth->execute([$_SESSION['auth']]);
             $results = $sth->fetch();
             if (!$results) {
-                ApplicationError("Authentication", "Your user account (${_SESSION['auth']}) does not exist within the application.", 401);
+                logout();
+                ApplicationError("Authentication", "Your user account (${_SERVER['PHP_AUTH_USER']}) does not exist within the application.", 401);
             } else if (isset($_SERVER['PHP_AUTH_USER']) && $results['Password'] != hash('sha256', ($_SERVER['PHP_AUTH_PW'] . $results['Salt']))) {
+                logout();
                 ApplicationError("Authentication", "Invalid password.", 401);
             }
             self::$user = self::getPerson($results['Person_ID']);
