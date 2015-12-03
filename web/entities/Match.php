@@ -91,8 +91,23 @@ class Match extends Entity {
         if(!isset($this->Team_A_ID) || !isset($this->Team_B_ID) || !is_numeric($this->Team_A_ID) || !is_numeric($this->Team_B_ID)) {
             ApplicationError("Match", "Both teams must be set before a match can begin!");
         }
-
         $dbh = Database::getInstance();
+
+        $sql = "SELECT Count(*) as active
+                FROM Matches
+                WHERE Status = 1
+                AND Tournament_ID = ?
+                AND (Team_A_ID = ? OR Team_B_ID = ?)";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$this->Tournament_ID, $this->Team_A_ID, $this->Team_A_ID]);
+        $teamAActive = intval($sth->fetch()['active']) > 0;
+        $sth->execute([$this->Tournament_ID, $this->Team_B_ID, $this->Team_B_ID]);
+        $teamBActive = intval($sth->fetch()['active']) > 0;
+        if ($teamAActive || $teamBActive) {
+            ApplicationError("Match", "Please ensure both teams previous matches are over before beginning a new one");
+        }
+
+
         $sql = "UPDATE Matches
                 SET Status = 1
                 WHERE Match_ID = ?";
