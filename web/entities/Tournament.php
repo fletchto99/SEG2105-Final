@@ -159,7 +159,7 @@ class Tournament extends Entity {
             ApplicationError("Tournament", "You need at least 2 teams registered before the tournament can begin!");
         }
 
-        if ($this->Tournament_Type) {
+        if (!$this->Tournament_Type) {
             ApplicationError("Tournament","A tournament requires a valid type before it can begin!");
         }
 
@@ -193,6 +193,7 @@ class Tournament extends Entity {
         $teamsRotated = $teams;
         if (sizeof($teamsRotated)%2!=0) {
             array_push($teamsRotated, null);
+            array_push($teams, null);
         }
         $mid = sizeof($teamsRotated) / 2;
         do {
@@ -204,7 +205,7 @@ class Tournament extends Entity {
             $teamsRotated = Utils::rotateArray($teamsRotated);
         } while($teamsRotated !== $teams);
         foreach($matches as $match) {
-            Match::create($this->Tournamnet_ID, null, null, $match['Team_A_ID'], $match['Team_B_ID']);
+            Match::create($this->Tournament_ID, null, null, $match['Team_A_ID'], $match['Team_B_ID']);
         }
     }
 
