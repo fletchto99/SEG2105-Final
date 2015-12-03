@@ -30,9 +30,8 @@ include 'nav.php';
             <td>T3</td>
         </tr>
         </tbody>
-    </table>
+    </table><br><br>
+    <a class="btn btn-default" type="button" id="addTeam" href="addTeam.php">Add Team</a>
 </div>
-
-
 </body>
 

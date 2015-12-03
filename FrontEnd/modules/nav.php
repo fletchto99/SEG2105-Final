@@ -27,6 +27,9 @@
                 <li class="page-scroll">
                     <a class="navbar-link" href="profile.php">Profile</a>
                 </li>
+                <li class="page-scroll">
+                    <a class="navbar-link" href="logout.php"><span class="glyphicon glyphicon-log-out">Logout</span></a>
+                </li>
             </ul>
         </div>
     </div>
