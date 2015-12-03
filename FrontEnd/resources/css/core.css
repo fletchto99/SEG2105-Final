@@ -1,8 +1,12 @@
 body {
-    padding-top: 65px;
-    text-align: center;
+    margin: 0 auto;
 }
 
 .table th{
     text-align: center;
+}
+
+#ContentPane {
+    margin-top: 75px;
+    max-width: 1000px;
 }

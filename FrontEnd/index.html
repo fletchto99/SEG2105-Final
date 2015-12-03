@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Tell the browser what charset to use -->
+        <meta charset="UTF-8">
+
+        <title>Tournament Maker</title>
+        <!-- Ensure IE is running in standards mode. Sometimes IE turns this off for intranet sites -->
+        <meta http-equiv="x-ua-compatible" content="IE=edge" />
+        <!-- Scale for mobile -->
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+        <!-- Allow Keeper to be bookmarked like an app on apple devices -->
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <!-- Make status bar black on the bookmarked apple web app -->
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="resources/favicon.png">
+        <!-- Bootstrap Core CSS -->
+        <link href="resources/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+        <!-- Custom Fonts -->
+        <link href="resources/vendor/fontawesome/css/font-awesome.css" rel="stylesheet" type="text/css">
+
+        <!-- jQueryUI CSS -->
+        <link href="resources/vendor/jQueryUI/jquery-ui.min.css" rel="stylesheet" type="text/css">
+
+        <!-- jQuery -->
+        <script src="resources/vendor/jQuery/js/jquery.min.js"></script>
+        <script src="resources/vendor/jQuery/js/jquery.mobile.min.js"></script>
+        <script src="resources/vendor/jQueryUI/jquery-ui.min.js"></script>
+
+        <!-- Bootstrap Core JavaScript -->
+        <script src="resources/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+        <!-- Load Core Styles -->
+        <link href="resources/css/core.css" rel="stylesheet" type="text/css">
+
+        <!-- Load Core Javascript -->
+        <script type="text/javascript" src="resources/js/core.js"></script>
+        <script type="text/javascript" src="resources/js/data.js"></script>
+        <script type="text/javascript" src="resources/js/utils.js"></script>
+
+        <!-- Load App Components JS -->
+        <script type="text/javascript" src="resources/js/components/datatable.js"></script>
+
+        <!-- Load App Modules JS -->
+        <script type="text/javascript" src="resources/js/modules/welcome.js"></script>
+        <script type="text/javascript" src="resources/js/modules/main.js"></script>
+        <script type="text/javascript" src="resources/js/modules/logout.js"></script>
+
+    </head>
+    <body>
+        <!-- Dynamically filled with site navigation -->
+        <nav id="NavigationBar" class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header page-scroll">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse"
+                            data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#main"><i class="fa fa-home"></i> Tournament Maker</a>
+                </div>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul id="NavigationBarLinks" class="nav navbar-nav navbar-right">
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!-- Main content container -->
+
+        <div id="ContentPane" class="container">
+            <h4>Loading...</h4>
+            <div id="NoJavascriptMessage">
+                <h5>If you see this message for more than five seconds, it is possible Javascript is disabled in your browser</h5><h5>Please click <a href="http://www.quackit.com/javascript/tutorial/how_to_enable_javascript.cfm" target="_blank">here</a> to learn how to enable it.</h5>
+            </div>
+        </div>
+
+        <!-- Startup Javascript. Runs after page is done loading. -->
+        <script type="text/javascript">
+            $(document).ready(function() {
+                Keeper.init();
+            });
+        </script>
+    </body>
+</html>
