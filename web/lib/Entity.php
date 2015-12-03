@@ -125,6 +125,9 @@ class Entity implements JsonSerializable {
      * Checks if a key contains a value within the entity
      */
     public function __isset($key) {
+        if ($this->data === null) {
+            return false;
+        }
         return array_key_exists($key, $this->data) ? isset($this->data[$key]) : false;
     }
 

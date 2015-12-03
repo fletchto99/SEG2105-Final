@@ -23,7 +23,11 @@ class Utils {
     }
 
     public static function isPowerOfTwo($number) {
-        return ($number & ($number - 1) == 0);
+        return ($number & ($number - 1)) == 0;
+    }
+
+    public static function calculateNumRounds($numTeams) {
+        return intval(log($numTeams, 2));
     }
 
 }

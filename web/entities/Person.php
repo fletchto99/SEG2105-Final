@@ -97,23 +97,22 @@ class Person extends Entity {
     public function create($personOnly = false) {
         $dbh = Database::getInstance();
 
-        if (!ctype_alnum($this->Username)) {
-            ApplicationError('Login', "A username may contain letters and numbers only!");
-        }
-
-        if (!ctype_alnum($this->Password)) {
-            ApplicationError('Login', "A password may contain letter and numbers only!");
-        }
-
-        if (strlen($this->Username) < 5 || strlen($this->Password) < 5) {
-            ApplicationError('Login', "Username and password must have at least 5 characters!");
-        }
-
         if (empty($this->First_Name) || empty($this->Last_Name)) {
             ApplicationError('Login', "First name and last name must be set!");
         }
 
         if (!$personOnly) {
+            if (!ctype_alnum($this->Username)) {
+                ApplicationError('Login', "A username may contain letters and numbers only!");
+            }
+
+            if (!ctype_alnum($this->Password)) {
+                ApplicationError('Login', "A password may contain letter and numbers only!");
+            }
+
+            if (strlen($this->Username) < 5 || strlen($this->Password) < 5) {
+                ApplicationError('Login', "Username and password must have at least 5 characters!");
+            }
             $sql =
                 "SELECT COUNT(*) as count
              FROM Logins
@@ -138,7 +137,7 @@ class Person extends Entity {
             }
         }
 
-        $sql = "INSERT INTO Persons(First_Name, Last_Name, Jersey_Number, Parson_Avatar, Role_ID)
+        $sql = "INSERT INTO Persons(First_Name, Last_Name, Jersey_Number, Person_Avatar, Role_ID)
                 VALUES (?,?,?,?,?)";
         $sth = $dbh->prepare($sql);
 
@@ -177,6 +176,10 @@ class Person extends Entity {
 
         if (!$team->checkAvailableJerseyNumber($this->Jersey_Number)) {
             ApplicationError("Number", "The number {$this->Jersey_Number} is already taken on {$team->Team_Name}");
+        }
+
+        if ($this->Role_Name == 'Organizer') {
+            ApplicationError("Team", "Organizers can't join teams!");
         }
 
         $dbh = Database::getInstance();

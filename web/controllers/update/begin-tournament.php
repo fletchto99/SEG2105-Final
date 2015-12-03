@@ -15,3 +15,5 @@ $input->fromJSON();
 $input->checkKeys(['Tournament_ID']);
 $tournament = Tournament::getTournament($input->Tournament_ID);
 $tournament->begin();
+$result = new Entity(['success'=>'Tournament has begun!']);
+echo $result->toJSON();

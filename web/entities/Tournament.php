@@ -163,21 +163,28 @@ class Tournament extends Entity {
             ApplicationError("Tournament","A tournament requires a valid type before it can begin!");
         }
 
-        if (($this->Torunament_Type == 0 || $this->Tournament_Type == 2) && !Utils::isPowerOfTwo($numRegistered)) {
+        if (($this->Tournament_Type == 0 || $this->Tournament_Type == 2) && !Utils::isPowerOfTwo($numRegistered)) {
 
             $numRequired = Utils::getNextPowerSquared($numRegistered);
             $numRequired -= $numRegistered;
 
-            ApplicationError("Tournament", "You n^2 teams to perform a knockout style tournament! That means you need {$numRequired} more teams!");
+            ApplicationError("Tournament", "You n^2 teams to perform a knockout style tournament! That means you need {$numRequired} more team(s)!");
         }
         if ($this->Tournament_Type == 0) {
-            $this->createKnockoutMatches($teams);
+            $this->createKnockoutMatches($numRegistered, $teams);
         } else if ($this->Tournament_Type == 1) {
             $this->createRoundRobinMatches($teams);
         } else if($this->Tournament_Type) {
             $this->createRoundRobinMatches($teams);
             $this->createKnockoutMatches(Utils::getPreviousPowerSquared($numRegistered));
         }
+
+        $dbh = DataBase::getInstance();
+        $sql = "UPDATE Tournaments
+                SET Status = 1
+                WHERE Tournament_ID = ?";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$this->Tournament_ID]);
 
     }
 
@@ -191,43 +198,49 @@ class Tournament extends Entity {
         do {
             for ($i = 0; $i < $mid; $i++) {
                 if ($teamsRotated[$i] !== null && $teamsRotated[$i+$mid] !== null) {
-                    array_push($matches, ['Team_A_ID' => $teamsRotated[$i]->Team_ID, 'Team_B_ID' => $teamsRotated[$i + $mid]->Team_ID]);
+                    array_push($matches, ['Team_A_ID' => $teamsRotated[$i]['Team_ID'], 'Team_B_ID' => $teamsRotated[$i + $mid]['Team_ID']]);
                 }
             }
             $teamsRotated = Utils::rotateArray($teamsRotated);
         } while($teamsRotated !== $teams);
         foreach($matches as $match) {
-            Match::create($this->Tournamnet_ID, null, $match['Team_A_ID'], $match['Team_B_ID']);
+            Match::create($this->Tournamnet_ID, null, null, $match['Team_A_ID'], $match['Team_B_ID']);
         }
     }
 
-    private function createKnockoutMatches($numBaseMatches, $teams = null) {
-        if ($teams !== null && $numBaseMatches !== sizeof($teams)) {
+    private function createKnockoutMatches($numTeams, $teams = null) {
+        if ($teams !== null && $numTeams !== sizeof($teams)) {
             ApplicationError("Internal Error", "Size of teams doesn't match the amount of matches to create.");
         }
-        if ($numBaseMatches > 2) {
+        if ($numTeams > 2) {
             $matches = [];
-            array_push($matches, Match::create($this->Tournament_ID));
-            while (sizeof($matches) !== ($numBaseMatches / 4)) {
+            $round = Utils::calculateNumRounds($numTeams);
+            array_push($matches, Match::create($this->Tournament_ID, null, 1));
+            $round--;
+            while (sizeof($matches) !== ($numTeams / 4)) {
                 $tmpMatches = [];
                 foreach ($matches as $match) {
-                    array_push($matches, Match::create($this->Tournament_ID, $match->Match_ID));
-                    array_push($matches, Match::create($this->Tournament_ID, $match->Match_ID));
+                    //Each match must have 2 child matches to determine 2 teams to play
+                    array_push($matches, Match::create($this->Tournament_ID, $match->Match_ID, $round));
+                    array_push($matches, Match::create($this->Tournament_ID, $match->Match_ID, $round));
                 }
                 $matches = $tmpMatches;
+                $round--;
             }
-            for($i = 0; $i < sizeof($matches); $i++) {
+            for($i = 1; $i < (sizeof($matches) + 1); $i++) {
                 if ($teams !== null) {
-                    Match::create($this->Tournament_ID, $matches[$i]->Match_ID, $teams[2*$i]->Team_ID, $teams[(2 * $i)+1]->Team_ID);
+                    Match::create($this->Tournament_ID, $matches[$i-1]->Match_ID, $round, $teams[(4*$i)-4]['Team_ID'], $teams[(4 * $i)-3]['Team_ID']);
+                    Match::create($this->Tournament_ID, $matches[$i-1]->Match_ID, $round, $teams[(4*$i)-2]['Team_ID'], $teams[(4 * $i)-1]['Team_ID']);
                 } else {
-                    Match::create($this->Tournament_ID, $matches[$i]->Match_ID);
+                    Match::create($this->Tournament_ID, $matches[$i-1]->Match_ID, $round);
+                    Match::create($this->Tournament_ID, $matches[$i-1]->Match_ID, $round);
                 }
             }
         } else {
             if ($teams !== null) {
-                Match::create($this->Tournament_ID, null, $teams[0]->Team_ID, $teams[1]->Team_ID);
+                Match::create($this->Tournament_ID, null, 1, $teams[0]['Team_ID'], $teams[1]['Team_ID']);
             } else {
-                Match::create($this->Tournament_ID);
+                Match::create($this->Tournament_ID, null, 1);
             }
         }
     }
@@ -238,29 +251,14 @@ class Tournament extends Entity {
         $sql = "SELECT Match_ID
                 FROM Matches
                 WHERE Tournament_ID = ?
-                AND Status = 0";
+                AND Status = ?";
         $sth = $dbh->prepare($sql);
-        $sth->execute([$this->Tournament_ID]);
-        $results = $sth->fetchAll(PDO::FETCH_COLUMN, 0);
-        $matches->addToData(['pregame'=>$results]);
-
-        $sql = "SELECT Match_ID
-                FROM Matches
-                WHERE Tournament_ID = ?
-                AND Status = 1";
-        $sth = $dbh->prepare($sql);
-        $sth->execute([$this->Tournament_ID]);
-        $results = $sth->fetchAll(PDO::FETCH_COLUMN, 0);
-        $matches->addToData(['inprogress' => $results]);
-
-        $sql = "SELECT Match_ID
-                FROM Matches
-                WHERE Tournament_ID = ?
-                AND Status = 2";
-        $sth = $dbh->prepare($sql);
-        $sth->execute([$this->Tournament_ID]);
-        $results = $sth->fetchAll(PDO::FETCH_COLUMN, 0);
-        $matches->addToData(['end' => $results]);
+        $sth->execute([$this->Tournament_ID, 0]);
+        $matches->addToData(['pregame'=> $sth->fetchAll()]);
+        $sth->execute([$this->Tournament_ID, 1]);
+        $matches->addToData(['inprogress' => $sth->fetchAll()]);
+        $sth->execute([$this->Tournament_ID, 2]);
+        $matches->addToData(['over' => $sth->fetchAll()]);
 
         return $matches;
     }
@@ -287,7 +285,7 @@ class Tournament extends Entity {
     public function getTeams() {
         $dbh = Database::getInstance();
         $result = new Entity();
-        $sql = "SELECT t.*
+        $sql = "SELECT t.Team_ID
                 FROM TournamentTeams tt
                     INNER JOIN Teams t ON tt.Team_ID = t.Team_ID
                 WHERE tt.Tournament_ID = ?";

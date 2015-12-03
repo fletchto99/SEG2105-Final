@@ -69,7 +69,7 @@ class Team extends Entity {
         $sql = "INSERT INTO Teams(Team_Name, Captain_ID, Team_Avatar)
                 Values(?,?,?)";
         $sth = $dbh->prepare($sql);
-        $sth->execute([$this->Team_Name, $user->Person_ID, $this->Team_Avatar]);
+        $sth->execute([$this->Team_Name, $user->Person_ID, $avatar]);
 
         $teamID = $dbh->lastInsertId();
         $user->joinTeam(self::getTeam($teamID));
@@ -102,24 +102,27 @@ class Team extends Entity {
         $dbh = Database::getInstance();
         $sth = $dbh->prepare($sql);
         $sth->execute([$Team_Name, $this->Team_ID]);
+        $this->Team_Name = $Team_Name;
         return new Entity(['success'=>"Team name updated to {$this->Team_Name}"]);
     }
 
     public function getTournaments($status = null) {
         $dbh = Database::getInstance();
-        $sql = "SELECT *
+        $sql = "SELECT t.Tournament_ID
                 FROM Tournaments t
-                    INNER JOIN TournamentTeams tt ON tt.Team_ID = t.Team_ID
+                    INNER JOIN TournamentTeams tt ON tt.Tournament_ID = t.Tournament_ID
                 WHERE
-                    t.Deleted = 0 AND
-                    tt.Deleted = 0";
+                    tt.Team_ID = ?
+                    AND t.Deleted = 0";
         if ($status != null) {
-            $sql .= "AND t.Status = ?";
+            $sql .= " AND t.Status = ?";
             $sth = $dbh->prepare($sql);
-            return $sth->execute([$status]);
+            $sth->execute([$this->Team_ID, $status]);
+            return $sth->fetchAll();
         } else {
             $sth = $dbh->prepare($sql);
-            return $sth->execute();
+            $sth->execute([$this->Team_ID]);
+            return $sth->fetchAll();
         }
     }
 
@@ -186,7 +189,7 @@ class Team extends Entity {
                     GROUP BY Player_ID
                     ORDER BY count DESC";
             $sth = $dbh->prepare($sql);
-            $sth->execute([$this->Team_ID, $tournament->Tournament_ID]);
+            $sth->execute([$this->Team_ID]);
             $results->addToData(['standings' => $sth->fetchAll(PDO::FETCH_COLUMN, 0)]);
         }
         return $results;

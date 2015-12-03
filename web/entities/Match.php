@@ -26,8 +26,8 @@ class Match extends Entity {
     }
 
     public static function getMatch($matchID) {
-        if (!isset($tournamentID)) {
-            ApplicationError('Match', 'matchID is not defined!');
+        if (!isset($matchID)) {
+            ApplicationError('Match', 'Match_ID is not defined!');
         }
 
         $match = new Match();
@@ -36,7 +36,7 @@ class Match extends Entity {
         return $match;
     }
 
-    public static function create($tournamentID, $nextMatchID = null, $teamAID = null, $teamBID = null) {
+    public static function create($tournamentID, $nextMatchID = null, $round = null, $teamAID = null, $teamBID = null) {
         $user = Person::user();
         if (!$user->hasRole('Organizer')) {
             ApplicationError("Match", "You must be a tournament organizer to create a match!", 403);
@@ -44,12 +44,12 @@ class Match extends Entity {
         if (!is_numeric($tournamentID)) {
             ApplicationError("Match", "A valid tournament is required to make a match!");
         }
-        $sql = "INSERT INTO Matches(Tournament_ID, Team_A_ID, Team_B_ID, Next_Match_ID)
-                VALUES (?,?,?,?)";
+        $sql = "INSERT INTO Matches(Tournament_ID, Team_A_ID, Team_B_ID, Next_Match_ID, Round)
+                VALUES (?,?,?,?,?)";
         $dbh = Database::getInstance();
         $sth = $dbh->prepare($sql);
 
-        $sth->execute([$tournamentID, $teamAID, $teamBID, $nextMatchID]);
+        $sth->execute([$tournamentID, $teamAID, $teamBID, $nextMatchID, $round]);
         return self::getMatch($dbh->lastInsertId());
     }
 
@@ -60,6 +60,10 @@ class Match extends Entity {
         }
         if ($this->Status != 1) {
             ApplicationError("Match", "A match must be in progress to add goals!");
+        }
+        $tournament = Tournament::getTournament($this->Tournament_ID);
+        if (!isset($player->Team_ID) || $player->Team_ID === null || ($player->Team_ID != $this->Team_A_ID && $player->Team_ID != $this->Team_B_ID)) {
+            ApplicationError("Goal", "Only players who are participating in the match can score goals!");
         }
         $sql = "INSERT INTO Goals(Match_ID, Player_ID, Assist_ID, Team_ID)
                 VALUES (?,?,?,?)";
@@ -140,6 +144,21 @@ class Match extends Entity {
             $sth->execute([$winningTeamID, $nextMatch->Match_ID]);
         }
 
+        //Check for knockout round robin, and check if round robin stage is over
+        $tournament = Tournament::getTournament($this->Tournament_ID);
+        if ($tournament->Tournament_Type == 2) {
+            $sql = "SELECT COUNT(*) as count
+                    FROM Matches
+                    WHERE Tournament_ID=?
+                        AND Round=null";
+            $sth = $dbh->prepare($sql);
+            $sth->execute([$tournament->Torunament_ID]);
+            $results = $sth->fetch();
+            if (intval($results['count']) < 1) {
+                ApplicationError("Implementation", "The knockout part is not yet implemented :(");
+            }
+        }
+
         return new Entity(['success' => 'Match ended!']);
     }
 
@@ -154,8 +173,8 @@ class Match extends Entity {
         $goals_A = $sth->fetch();
         $sth->execute([$this->Match_ID, $this->Team_B_ID]);
         $goals_B = $sth->fetch();
-        $this->addToData(['Team_A_Score'=>$goals_A]);
-        $this->addToData(['Team_B_Score'=>$goals_B]);
+        $this->addToData(['Team_A_Score'=>$goals_A['count']]);
+        $this->addToData(['Team_B_Score'=>$goals_B['count']]);
         return $this;
     }
 

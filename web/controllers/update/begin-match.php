@@ -13,3 +13,5 @@ $input->fromJSON();
 $input->checkKeys(['Match_ID']);
 $match = Match::getMatch($input->Match_ID);
 $match->begin();
+$result = new Entity(['success'=>'Match has begun!']);
+echo $result->toJSON();

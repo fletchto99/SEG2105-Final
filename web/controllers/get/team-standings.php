@@ -14,7 +14,7 @@ $input->fromJSON();
 $input->checkKeys(['Team_ID']);
 if (isset($input->Tournament_ID)) {
     $tournament = Tournament::getTournament($input->Tournament_ID);
-    echo Team::getTeam($input->Team_ID)->getRankings($tournament);
+    echo Team::getTeam($input->Team_ID)->getRankings($tournament)->toJSON();
 } else {
-    echo Team::getTeam($input->Team_ID)->getRankings();
+    echo Team::getTeam($input->Team_ID)->getRankings()->toJSON();
 }

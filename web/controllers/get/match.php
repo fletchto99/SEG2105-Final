@@ -11,4 +11,4 @@ $input = new Entity();
 $input->fromJSON();
 $input->checkKeys(['Match_ID']);
 $match = Match::getMatch($input->Match_ID);
-echo $match->withScores();
+echo $match->withScores()->toJSON();
