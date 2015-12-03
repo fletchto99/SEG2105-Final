@@ -37,12 +37,6 @@ Keeper.createModule(function (Keeper) {
      * @returns {boolean} True if the module was displayed successfully; otherwise false
      */
     Module.display = function (ContentPane, parameters) {
-        var title = createElement({
-            elem: 'h2',
-            className: 'form-signin-heading',
-            textContent: 'Welcome'
-        });
-
 
         var usernameInput = createElement({
             elem: 'input',
@@ -65,31 +59,50 @@ Keeper.createModule(function (Keeper) {
             }
         });
 
-        var submitButton = createElement({
-            elem: 'input',
-            type: 'submit',
-            className: 'btn btn-lg btn-primary btn-block'
+        var loginForm = createElement({
+            elem: 'div',
+            inside: [
+                usernameInput,
+                passwordInput
+            ]
         });
 
-        var form = createElement({
-            elem: 'form',
-            className: 'sign-in',
-            putIn: ContentPane,
-            inside: [
-                title,
-                usernameInput,
-                passwordInput,
-                submitButton
-            ],
-            onsubmit: function (event) {
-                event.preventDefault();
-                Keeper.data.login(usernameInput.value, passwordInput.value).done(function (data) {
-                    Keeper.user = data;
-                    Keeper.loadModule('main');
-                }).fail(function (error) {
-                    alert(error.message);
-                })
-            }
+        createElement({
+            elem: 'button',
+            textContent: 'Login',
+            className: 'btn btn-default',
+            onclick: function () {
+                Keeper.showModal('test', loginForm,
+                    'Login',
+                    function () {
+                        Keeper.data.login(usernameInput.value, passwordInput.value).done(function (data) {
+                            Keeper.user = data;
+                            Keeper.loadModule('main');
+                        }).fail(function (error) {
+                            alert(error.message);
+                        });
+                    });
+            },
+            putIn: ContentPane
+        });
+
+        createElement({
+            elem: 'button',
+            textContent: 'Create User',
+            className: 'btn btn-default',
+            onclick: function () {
+                Keeper.showModal('test', loginForm,
+                    'Login',
+                    function () {
+                        Keeper.data.login(usernameInput.value, passwordInput.value).done(function (data) {
+                            Keeper.user = data;
+                            Keeper.loadModule('main');
+                        }).fail(function (error) {
+                            alert(error.message);
+                        });
+                    });
+            },
+            putIn: ContentPane
         });
         return true;
     };
