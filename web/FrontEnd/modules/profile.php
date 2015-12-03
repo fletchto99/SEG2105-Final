@@ -17,8 +17,8 @@
 include 'nav.php';
 ?>
 <div class="container">
-    <h1>Profile</h1>
-    <table></table>
+    <h2>Profile</h2><br><br>
+    <button class="btn btn-default" type="submit">Button</button>
 </div>
 
 

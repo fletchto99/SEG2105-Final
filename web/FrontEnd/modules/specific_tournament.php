@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
 
     <!-- Title -->
@@ -24,23 +24,29 @@ include 'nav.php';
         <tr>
             <th>Rank</th>
             <th>Team</th>
+            <th>Matches Won</th>
         </tr>
         </thead>
         <tbody>
         <tr>
             <td>1</td>
-            <td>T1</td>
+            <td>Bollocks</td>
+            <td>5/10</td>
         </tr>
         <tr>
             <td>2</td>
-            <td>T2</td>
+            <td>Team Green</td>
+            <td>3/7</td>
         </tr>
         <tr>
             <td>3</td>
-            <td>T3</td>
+            <td>Team Red</td>
+            <td>2/6</td>
         </tr>
         </tbody>
     </table>
+    </br></br>
+    <button class="btn btn-default" id="btn_view_matches" type="button">View Matches</button>
 </div>
 
 
