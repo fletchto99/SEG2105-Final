@@ -55,14 +55,14 @@ function logout() {
 function fatalHandler() {
     $error = error_get_last();
     if ($error["type"] == E_ERROR) {
-        ApplicationError('Internal', $error["message"] .
-            "\n\nFrom: " . $error['file'] . ', line: ' . $error["line"]);
+        ApplicationError('Internal', $error["message"]);
+//            "\n\nFrom: " . $error['file'] . ', line: ' . $error["line"]);
     }
 }
 
 function exceptionHandler(Exception $error) {
-    ApplicationError('Internal', get_class($error) . ': ' . $error->getMessage() .
-        "\n\nFrom: " . $error->getFile() . ', line: ' . $error->getLine());
+    ApplicationError('Internal', get_class($error) . ': ' . $error->getMessage());
+//        "\n\nFrom: " . $error->getFile() . ', line: ' . $error->getLine());
 }
 
 function errorHandler($num, $str, $file, $line) {

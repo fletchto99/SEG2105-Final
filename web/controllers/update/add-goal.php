@@ -17,3 +17,5 @@ $match = Match::getMatch($input->Match_ID);
 $player = Person::getPerson($input->Player_ID);
 $assistPlayer = isset($input->Assist_ID) ? Person::getPerson($input->Assist_ID) : null;
 $match->addGoal($player, $assistPlayer);
+$result = new Entity(['success'=>'Goal has been added!']);
+echo $result->toJSON();

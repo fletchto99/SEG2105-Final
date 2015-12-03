@@ -61,7 +61,6 @@ class Match extends Entity {
         if ($this->Status != 1) {
             ApplicationError("Match", "A match must be in progress to add goals!");
         }
-        $tournament = Tournament::getTournament($this->Tournament_ID);
         if (!isset($player->Team_ID) || $player->Team_ID === null || ($player->Team_ID != $this->Team_A_ID && $player->Team_ID != $this->Team_B_ID)) {
             ApplicationError("Goal", "Only players who are participating in the match can score goals!");
         }
@@ -135,7 +134,7 @@ class Match extends Entity {
         $sth = $dbh->prepare($sql);
         $sth->execute([$winningTeamID, $this->Match_ID]);
 
-        if ($this->Next_Match_ID) {
+        if ($this->Next_Match_ID !== null) {
             $nextMatch = Match::getMatch($this->Next_Match_ID);
             $sql = "UPDATE Matches
                 SET ".((isset($nextMatch->Team_A_ID) && is_numeric($nextMatch->Team_A_ID)) ? "Team_B_ID" : "Team_A_ID")." = ?

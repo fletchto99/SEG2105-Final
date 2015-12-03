@@ -52,7 +52,7 @@ class Tournament extends Entity {
             ApplicationError('Team', 'Unable to create team, user is already a member of a team!');
         }
 
-        if ($this->Tournament_Type || ($this->Tournament_Type < 0 || $this->Tournament_Type > 2)) {
+        if (!is_numeric($this->Tournament_Type) || $this->Tournament_Type < 0 || $this->Tournament_Type > 2) {
             ApplicationError("Tournament", "The tournament must be of value 0 (Knock Out), 1 (Round Robin) or 2(Knock out round robin)!");
         }
 
@@ -301,7 +301,7 @@ class Tournament extends Entity {
         }
         $result = new Entity(['Tournament_ID'=>$this->Tournament_ID, 'Tournament_Type'=>$this->Tournamnet_Type]);
 
-        if ($this->Tournamnet_Type == 1) {
+        if ($this->Tournament_Type == 1) {
             //TODO: Implement
         }
         return $result;
