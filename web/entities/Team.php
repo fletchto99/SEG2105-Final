@@ -209,12 +209,28 @@ class Team extends Entity {
     public static function getTeams() {
         $dbh = Database::getInstance();
         $result = new Entity();
-        $sql = "SELECT Team_ID, Team_Name
-                FROM Teams
-                WHERE Deleted = 0";
+        $sql = "SELECT t.Team_ID, t.Team_Name, p.First_Name as Captain_First_Name, p.Last_Name as Captain_Last_Name
+                FROM Teams t
+                    INNER JOIN Persons p ON p.Person_ID = t.Captain_ID
+                WHERE t.Deleted = 0";
         $sth = $dbh->prepare($sql);
         $sth->execute();
         $result->addToData(['Teams'=>$sth->fetchAll()]);
+        return $result;
+    }
+
+    public static function getTeamsNotInTournament($tournament) {
+        $dbh = Database::getInstance();
+        $result = new Entity();
+        $sql = "SELECT DISTINCT t.Team_ID, t.Team_Name
+                FROM Teams t
+                    LEFT JOIN TournamentTeams tt on tt.Team_ID = t.Team_ID AND tt.tournament_ID = ?
+                WHERE t.Deleted = 0
+                    AND tt.Tournament_ID IS NULL";
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$tournament->Tournament_ID]);
+        $result->addToData(['Teams' => $sth->fetchAll()]);
+
         return $result;
     }
 

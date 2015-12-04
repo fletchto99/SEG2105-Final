@@ -267,7 +267,7 @@ class Tournament extends Entity {
     public static function getTournaments($deleted = false) {
         $results = new Entity();
         $dbh = Database::getInstance();
-        $sql = "SELECT Tournament_ID
+        $sql = "SELECT Tournament_ID, Tournament_Name, Tournament_Type
                 FROM Tournaments
                 WHERE Status = ?";
         if (!$deleted) {
@@ -286,9 +286,10 @@ class Tournament extends Entity {
     public function getTeams() {
         $dbh = Database::getInstance();
         $result = new Entity();
-        $sql = "SELECT t.Team_ID
+        $sql = "SELECT t.Team_ID, t.Team_Name, p.First_Name as Captain_First_Name, p.Last_Name as Captain_Last_Name
                 FROM TournamentTeams tt
                     INNER JOIN Teams t ON tt.Team_ID = t.Team_ID
+                    INNER JOIN Persons p ON t.Captain_ID = p.Person_ID
                 WHERE tt.Tournament_ID = ?";
         $sth = $dbh->prepare($sql);
         $sth->execute([$this->Tournament_ID]);
@@ -318,9 +319,10 @@ class Tournament extends Entity {
         $teams = $this->getTeams()->Teams;
         $standings = [];
         foreach ($teams as $team) {
-            $data = new Entity();
 
+            $data = new Entity();
             $data->addToData(['Team_ID' => $team['Team_ID']]);
+            $data->addToData(['Team_Name' => $team['Team_Name']]);
 
             $sql = "SELECT COUNT(*) as Matches_Won
                     FROM Matches
@@ -352,8 +354,11 @@ class Tournament extends Entity {
 
     private function calcKOStats() {
         $dbh = Database::getInstance();
-        $sql = "SELECT Winning_Team_ID, Team_A_ID, Team_B_ID, Round
-                    FROM Matches
+        $sql = "SELECT m.Match_ID, m.Winning_Team_ID, m.Team_A_ID, m.Team_B_ID, m.Round, Team_A.Team_Name as Team_A_Name, Team_B.Team_Name as Team_B_Name, Winning_Team.Team_Name as Winning_Team_Name
+                    FROM Matches m
+                        INNER JOIN Teams Team_A ON Team_A.Team_ID = m.Team_A_ID
+                        INNER JOIN Teams Team_B ON Team_B.Team_ID = m.Team_B_ID
+                        INNER JOIN Teams Winning_Team ON Winning_Team.Team_ID = m.Winning_Team_ID
                     WHERE Tournament_ID = ?
                         AND Round IS NOT NULL
                     ORDER BY Round DESC";
