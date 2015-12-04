@@ -44,8 +44,27 @@
         $(document.getElementById('NavigationBar')).hide();
         Keeper.data.isAuthenticated().done(function (data) {
             Keeper.user = data;
-            Keeper.loadModule('main');
-            Keeper.showAlert('Welcome to Tournament Maker ' + Keeper.user.First_Name, 'info', 10000);
+
+            var start = function() {
+                Keeper.processHashChange();
+                Keeper.showAlert('Welcome to Tournament Maker ' + Keeper.user.First_Name, 'info', 10000);
+            };
+            if (Keeper.user.Team_ID != null) {
+                Keeper.data.get('team').done(function(data) {
+                    Keeper.user.Team = data;
+                    start();
+                }).fail(function(data) {
+                    Keeper.showAlert(data.message, 'warning');
+                    Keeper.user.Team = null;
+                    start();
+                })
+            } else {
+                Keeper.user.Team = null;
+                start();
+            }
+
+
+
         }).fail(function () {
             Keeper.user = {
                 Person_ID: -1,
@@ -152,6 +171,9 @@
      */
     Keeper.loadModule = function (module, parameters, pushState) {
         module = Keeper.Module(module);
+        if (module === undefined) {
+            module = Keeper.ModuleMap[Object.keys(Keeper.ModuleMap)[0]];
+        }
         // Handle case where module doesn't exist
         if (!module) {
             console.log("Could not locate, displaying 404 overlay.");

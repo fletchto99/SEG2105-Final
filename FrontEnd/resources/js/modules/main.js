@@ -49,7 +49,11 @@ Keeper.createModule(function (Keeper) {
         });
 
         if (Keeper.hasRole('Organizer')) {
-
+            createElement({
+                elem: 'p',
+                textContent: 'Welcome to tournament maker, ' + Keeper.user.First_Name + '! This page will soon serve as your personal organizer portal.',
+                putIn: ContentPane
+            });
         } else {
             if (Keeper.user.Jersey_Number == null) {
                 createElement({
@@ -66,7 +70,7 @@ Keeper.createModule(function (Keeper) {
             } else {
                 createElement({
                     elem: 'p',
-                    textContent: 'Welcome to tournament maker, ' + Keeper.user.First_Name + '! This page will soon server as your personal portal.',
+                    textContent: 'Welcome to tournament maker, ' + Keeper.user.First_Name + '! This page will soon serve as your personal portal.',
                     putIn: ContentPane
                 });
             }
@@ -94,9 +98,9 @@ Keeper.createModule(function (Keeper) {
                                 Jersey_Number: jerseyNumberInput.value
                             }).done(function (data) {
                                 console.log(data);
-                                Keeper.user.Jersey_Number = data.number;
+                                Keeper.user.Jersey_Number = data.Number;
                                 Keeper.showAlert(data.Success, 'info', 10000);
-                                Keeper.hideModal();
+                                Keeper.reloadModule();
                             }).fail(function (error) {
                                 Keeper.showAlert(error.message, 'danger');
                             });

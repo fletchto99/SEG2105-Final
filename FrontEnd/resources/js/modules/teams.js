@@ -2,7 +2,7 @@
  *  Author(s)           :  Matt Langlois
  *  File Created        :  December 2015
  *  Application Path    :  /#teams
- *  Details             :  Module to display welcome screen
+ *  Details             :  Module to display teams in the system (ability for player to join/create a team)
  */
 
 Keeper.createModule(function (Keeper) {
@@ -42,10 +42,39 @@ Keeper.createModule(function (Keeper) {
             return false;
         }
 
-        createElement({
-            elem: 'h1',
-            textContent: 'Teams'
-        });
+        if (parameters[0]) {
+            console.log(parameters);
+            Keeper.data.get('tournament', {
+                Tournament_ID: parameters[0]
+            }).done(function (data) {
+                createElement({
+                    elem: 'h1',
+                    textContent: 'Teams in ' + data.Tournament_Name,
+                    putIn: ContentPane
+                });
+                Keeper.data.get('teams-in-tournament', {
+                    Tournament_ID: parameters[0]
+                }).done(function (data) {
+                    Module.buildTeamsTable(data.Teams, ContentPane);
+                }).fail(function (data) {
+                    Keeper.showAlert(data.message, 'danger');
+                });
+            }).fail(function (data) {
+                Keeper.showAlert(data.message, 'danger');
+            });
+        } else {
+            createElement({
+                elem: 'h1',
+                textContent: 'All Teams',
+                putIn: ContentPane
+            });
+            Keeper.data.get('teams').done(function (data) {
+                Module.buildTeamsTable(data.Teams, ContentPane);
+            }).fail(function (data) {
+                Keeper.showAlert(data.message, 'danger');
+            });
+        }
+
 
         if (Keeper.hasRole('Organizer')) {
 
@@ -54,6 +83,45 @@ Keeper.createModule(function (Keeper) {
         }
 
         return true;
+    };
+
+    Module.buildTeamsTable = function (teams, container) {
+        teams.forEach(function (team) {
+            team.Captain = team.Captain_First_Name + " " + team.Captain_Last_Name;
+        });
+        var buttons = [{
+            title: 'Team Statistics',
+            text: 'Statistics',
+            style: 'primary',
+            onclick: function (row) {
+                Keeper.showAlert('Implement this!!', 'danger');
+            }
+        }];
+        if (Keeper.hasRole('Player') && Keeper.user.Team == null) {
+            buttons.push({
+                title: 'Join team',
+                text: 'Join Team',
+                style: 'success',
+                onclick: function (row) {
+                    Keeper.showAlert('Implement this!!', 'danger');
+                }
+            })
+        }
+        Keeper.createTableFromData({
+            data: teams,
+            fields: [
+                {
+                    title: 'Team Name',
+                    key: 'Team_Name'
+                },
+                {
+                    title: 'Team Captain',
+                    key: 'Captain'
+                }
+            ],
+            buttons: buttons,
+            putIn: container
+        });
     };
 
     return Module;
