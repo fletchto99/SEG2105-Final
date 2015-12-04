@@ -171,26 +171,61 @@ class Team extends Entity {
 
         //TODO: Flawed logic, will only return players which have scores goals, should put players who haven't scored on the bottom, sorted by name or something
         if (isset($tournament)) {
-            $sql = "SELECT g.Player_ID, count(g.*) as count
+            $sql = "SELECT g.Player_ID, count(*) as Goals_Scored, p.First_Name, p.Last_Name
                     FROM Goals g
                         INNER JOIN Matches m on g.Match_ID = m.Match_ID
                         INNER JOIN Tournaments t on t.Tournament_ID = m.Tournament_ID
-                    WHERE g.Team_ID = ? AND
-                        t.Tournament_ID = ?
-                    GROUP BY Player_ID
-                    ORDER BY count DESC";
+                        INNER JOIN Persons p on p.Person_ID = g.Player_ID
+                    WHERE g.Team_ID = ?
+                        AND g.Player_ID IS NOT NULL
+                        AND t.Tournament_ID = ?
+                    GROUP BY g.Player_ID
+                    HAVING count(*) > 0
+                    UNION
+                    SELECT Person_ID as Player_ID, 0 as Goals_Scored, First_Name, Last_Name
+                    FROM Persons
+                    WHERE Team_ID = ?";
+
+            $sql = "SELECT Player_ID, max(Goals_Scored) as Goals_Scored, First_Name, Last_Name
+                    FROM (
+                        SELECT g.Player_ID, count(*) as Goals_Scored, p.First_Name, p.Last_Name
+                        FROM Goals g
+                            INNER JOIN Persons p on p.Person_ID = g.Player_ID
+                            INNER JOIN Matches m on g.Match_ID = m.Match_ID
+                            INNER JOIN Tournaments t on t.Tournament_ID = m.Tournament_ID
+                        WHERE g.Team_ID = ?
+                            AND g.Player_ID IS NOT NULL
+                            AND t.Tournament_ID = ?
+                        GROUP BY g.Player_ID
+                        HAVING count(*) > 0
+                        UNION
+                        SELECT Person_ID as Player_ID, 0 as Goals_Scored, First_Name, Last_Name
+                        FROM Persons
+                        WHERE Team_ID = ?
+                            AND Person_ID IS NOT NULL
+                    ) as Results";
             $sth = $dbh->prepare($sql);
-            $sth->execute([$this->Team_ID, $tournament->Tournament_ID]);
-            $results->addToData(['standings'=>$sth->fetchAll(PDO::FETCH_COLUMN, 0)]);
+            $sth->execute([$this->Team_ID, $tournament->Tournament_ID, $this->Team_ID]);
+            $results->addToData(['standings'=>$sth->fetchAll()]);
         } else {
-            $sql = "SELECT Player_ID, count(*) as count
-                    FROM Goals
-                    WHERE Team_ID = ?
-                    GROUP BY Player_ID
-                    ORDER BY count DESC";
+            $sql = "SELECT Player_ID, max(Goals_Scored) as Goals_Scored, First_Name, Last_Name
+                    FROM (
+                        SELECT g.Player_ID, count(*) as Goals_Scored, p.First_Name, p.Last_Name
+                        FROM Goals g
+                            INNER JOIN Persons p on p.Person_ID = g.Player_ID
+                        WHERE g.Team_ID = ?
+                            AND g.Player_ID IS NOT NULL
+                        GROUP BY g.Player_ID
+                        HAVING count(*) > 0
+                        UNION
+                        SELECT Person_ID as Player_ID, 0 as Goals_Scored, First_Name, Last_Name
+                        FROM Persons
+                        WHERE Team_ID = ?
+                            AND Person_ID IS NOT NULL
+                    ) as Results";
             $sth = $dbh->prepare($sql);
-            $sth->execute([$this->Team_ID]);
-            $results->addToData(['standings' => $sth->fetchAll(PDO::FETCH_COLUMN, 0)]);
+            $sth->execute([$this->Team_ID, $this->Team_ID]);
+            $results->addToData(['standings' => $sth->fetchAll()]);
         }
         return $results;
     }

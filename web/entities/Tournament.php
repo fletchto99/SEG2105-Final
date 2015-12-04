@@ -159,7 +159,7 @@ class Tournament extends Entity {
             ApplicationError("Tournament", "You need at least 2 teams registered before the tournament can begin!");
         }
 
-        if (!$this->Tournament_Type) {
+        if (!isset($this->Tournament_Type) || !is_numeric($this->Tournament_Type)) {
             ApplicationError("Tournament","A tournament requires a valid type before it can begin!");
         }
 
@@ -249,10 +249,11 @@ class Tournament extends Entity {
     public function getMatches() {
         $matches = new Entity();
         $dbh = Database::getInstance();
-        $sql = "SELECT m.Match_ID, m.Team_A_ID, m.Team_B_ID, a.Team_Name, b.Team_Name
+        $sql = "SELECT m.Match_ID, m.Team_A_ID, m.Team_B_ID, a.Team_Name as Team_A_Name, b.Team_Name as Team_B_Name, m.Winning_Team_ID, w.Team_Name as Winning_Team_Name
                 FROM Matches m
-                    INNER JOIN Teams a ON a.Team_ID = m.Team_A_ID
-                    INNER JOIN Teams b ON b.Team_ID = m.Team_ID
+                    LEFT JOIN Teams a ON a.Team_ID = m.Team_A_ID
+                    LEFT JOIN Teams b ON b.Team_ID = m.Team_B_ID
+                    LEFT JOIN Teams w ON w.Team_ID = m.Winning_Team_ID
                 WHERE m.Tournament_ID = ?
                 AND m.Status = ?";
         $sth = $dbh->prepare($sql);
