@@ -249,10 +249,12 @@ class Tournament extends Entity {
     public function getMatches() {
         $matches = new Entity();
         $dbh = Database::getInstance();
-        $sql = "SELECT Match_ID
-                FROM Matches
-                WHERE Tournament_ID = ?
-                AND Status = ?";
+        $sql = "SELECT m.Match_ID, m.Team_A_ID, m.Team_B_ID, a.Team_Name, b.Team_Name
+                FROM Matches m
+                    INNER JOIN Teams a ON a.Team_ID = m.Team_A_ID
+                    INNER JOIN Teams b ON b.Team_ID = m.Team_ID
+                WHERE m.Tournament_ID = ?
+                AND m.Status = ?";
         $sth = $dbh->prepare($sql);
         $sth->execute([$this->Tournament_ID, 0]);
         $matches->addToData(['pregame'=> $sth->fetchAll()]);
