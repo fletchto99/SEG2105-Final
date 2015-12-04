@@ -38,6 +38,12 @@ Keeper.createModule(function (Keeper) {
      */
     Module.display = function (ContentPane, parameters) {
 
+        createElement({
+            elem: 'h1',
+            textContent: 'Welcome to Tournament Maker',
+            putIn: ContentPane
+        });
+
         var usernameInput = createElement({
             elem: 'input',
             type: 'text',
@@ -59,6 +65,49 @@ Keeper.createModule(function (Keeper) {
             }
         });
 
+        var createAccountUsername = createElement({
+            elem: 'input',
+            type: 'text',
+            className: 'form-control',
+            attributes: {
+                placeHolder: 'Username',
+                required: '',
+                autofocus: ''
+            }
+        });
+
+        var createAccountPassword = createElement({
+            elem: 'input',
+            type: 'password',
+            className: 'form-control',
+            attributes: {
+                placeHolder: 'Password',
+                required: ''
+            }
+        });
+
+        var firstnameInput = createElement({
+            elem: 'input',
+            type: 'text',
+            className: 'form-control',
+            attributes: {
+                placeHolder: 'First Name',
+                required: '',
+                autofocus: ''
+            }
+        });
+
+        var lastnameInput = createElement({
+            elem: 'input',
+            type: 'text',
+            className: 'form-control',
+            attributes: {
+                placeHolder: 'Last Name',
+                required: '',
+                autofocus: ''
+            }
+        });
+
         var loginForm = createElement({
             elem: 'div',
             inside: [
@@ -67,20 +116,32 @@ Keeper.createModule(function (Keeper) {
             ]
         });
 
+        var createAccountForm = createElement({
+            elem: 'div',
+            inside: [
+                createAccountUsername,
+                createAccountPassword,
+                firstnameInput,
+                lastnameInput
+            ]
+        });
+
         createElement({
             elem: 'button',
             textContent: 'Login',
-            className: 'btn btn-default',
+            className: 'welcomebtn btn btn-info btn-lg',
             onclick: function () {
-                Keeper.showModal('test', loginForm,
+                Keeper.showModal('Login', loginForm,
                     'Login',
                     function () {
                         Keeper.data.login(usernameInput.value, passwordInput.value).done(function (data) {
                             Keeper.user = data;
                             Keeper.loadModule('main');
+                            Keeper.showAlert('Welcome to Tournament Maker ' + Keeper.user.First_Name, 'info', 10000);
                         }).fail(function (error) {
-                            alert(error.message);
+                            Keeper.showAlert(error.message, 'danger');
                         });
+                        return false;
                     });
             },
             putIn: ContentPane
@@ -89,18 +150,24 @@ Keeper.createModule(function (Keeper) {
         createElement({
             elem: 'button',
             textContent: 'Create User',
-            className: 'btn btn-default',
+            className: 'welcomebtn btn btn-info btn-lg',
             onclick: function () {
-                Keeper.showModal('test', loginForm,
+                Keeper.showModal('Create Account', createAccountForm,
                     'Login',
                     function () {
-                        Keeper.data.login(usernameInput.value, passwordInput.value).done(function (data) {
+                        Keeper.data.update('create-user',{
+                            Username: createAccountUsername.value,
+                            Password: createAccountPassword.value,
+                            First_Name: firstnameInput.value,
+                            Last_Name: lastnameInput.value
+                        }).done(function (data) {
                             Keeper.user = data;
                             Keeper.loadModule('main');
+                            Keeper.showAlert('Welcome to Tournament Maker ' + Keeper.user.First_Name, 'info', 10000);
                         }).fail(function (error) {
-                            alert(error.message);
+                            Keeper.showAlert(error.message, 'danger');
                         });
-                    });
+                    })
             },
             putIn: ContentPane
         });

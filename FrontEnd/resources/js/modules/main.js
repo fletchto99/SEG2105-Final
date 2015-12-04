@@ -42,59 +42,6 @@ Keeper.createModule(function (Keeper) {
             return false;
         }
 
-        var title = createElement({
-            elem: 'h2',
-            className: 'form-signin-heading',
-            textContent: 'Welcome'
-        });
-
-
-        var usernameInput = createElement({
-            elem: 'input',
-            type: 'text',
-            className: 'form-control',
-            attributes: {
-                placeHolder: 'Username',
-                required: '',
-                autofocus: ''
-            }
-        });
-
-        var passwordInput = createElement({
-            elem: 'input',
-            type: 'password',
-            className: 'form-control',
-            attributes: {
-                placeHolder: 'Password',
-                required: ''
-            }
-        });
-
-        var submitButton = createElement({
-            elem: 'input',
-            type: 'submit',
-            className: 'btn btn-lg btn-primary btn-block'
-        });
-
-        var form = createElement({
-            elem: 'form',
-            className: 'sign-in',
-            putIn: ContentPane,
-            inside: [
-                title,
-                usernameInput,
-                passwordInput,
-                submitButton
-            ],
-            onsubmit: function (event) {
-                event.preventDefault();
-                Keeper.data.login(usernameInput.value, passwordInput.value).done(function (data) {
-                    Keeper.user = data;
-                }).fail(function (error) {
-                    console.log(error);
-                })
-            }
-        });
         return true;
     };
 

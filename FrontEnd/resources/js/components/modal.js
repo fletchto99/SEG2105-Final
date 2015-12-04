@@ -11,12 +11,19 @@
         document.getElementById('ModalTitle').textContent = modalTitle;
         document.getElementById('ModalButton').textContent = buttonTitle;
         document.getElementById('ModalButton').onclick = function(event) {
-            modal.modal('hide');
+            var dismiss = true;
+
             if (typeof(onSubmit) == 'function') {
-                onSubmit();
+                dismiss = onSubmit();
             }
+            dismiss && modal.modal('hide');
             event.preventDefault();
         };
         modal.modal('show');
     };
+
+    Keeper.hideModal = function() {
+        $('#MainModal').modal('hide');
+    }
+
 })();

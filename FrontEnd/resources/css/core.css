@@ -9,4 +9,5 @@ body {
 #ContentPane {
     margin-top: 75px;
     max-width: 1000px;
+    text-align: center;
 }

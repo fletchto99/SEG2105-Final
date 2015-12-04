@@ -32,7 +32,7 @@
         return Keeper.user.Person_ID > 0 && Keeper.user.Role_Name == roleName;
     };
 
-    Keeper.isLoggedIn = function() {
+    Keeper.isLoggedIn = function () {
         return Keeper.user.Person_ID !== undefined && Keeper.user.Person_ID > 0;
     };
 
@@ -45,6 +45,7 @@
         Keeper.data.isAuthenticated().done(function (data) {
             Keeper.user = data;
             Keeper.loadModule('main');
+            Keeper.showAlert('Welcome to Tournament Maker ' + Keeper.user.First_Name, 'info', 10000);
         }).fail(function () {
             Keeper.user = {
                 Person_ID: -1,
@@ -54,29 +55,12 @@
         });
 
         window.addEventListener('hashchange', Keeper.processHashChange);
+
+        window.addEventListener('error', function (e) {
+            Keeper.showAlert(e.message, 'danger');
+        });
+
     };
-
-    // -------------------------------------- Event Handlers -------------------------------------- //
-
-    /**
-     * Listen for errors and ensure they are reported
-     */
-    window.addEventListener('error', function (e) {
-        if (Keeper.show_errors) {
-            var error = e.error;
-            var report = error.message.split(/:(.+)?/);
-
-            var message, title;
-            if (report.length === 1) {
-                message = report[0];
-            } else {
-                title = report[0];
-                message = report[1];
-            }
-
-            Keeper.error(title, message, error.stack);
-        }
-    });
 
 
     // ------------------------------- Core Keeper Library Functions -------------------------------- //
@@ -225,6 +209,9 @@
         // Build nav bar again
         Keeper.populateNavigationBar();
 
+        //Hide any previously open modals
+        Keeper.hideModal();
+
         // Load content
         var doLoad = function () {
 
@@ -265,14 +252,14 @@
                     }
                 };
                 createElement({
-                                  id: "CurrentModuleStyleTag",
-                                  elem: 'link',
-                                  rel: 'stylesheet',
-                                  type: 'text/css',
-                                  href: 'resources/css/modules/' + Keeper.CurrentModule.css,
-                                  onload: onloadFunc,
-                                  putIn: document.head
-                              });
+                    id: "CurrentModuleStyleTag",
+                    elem: 'link',
+                    rel: 'stylesheet',
+                    type: 'text/css',
+                    href: 'resources/css/modules/' + Keeper.CurrentModule.css,
+                    onload: onloadFunc,
+                    putIn: document.head
+                });
                 // We use a set timeout to guarantee that the module will load, regardless of the css.
                 setTimeout(function () {
                     onloadFunc();
@@ -313,23 +300,24 @@
 
                 // Create the module button for the navigation
                 var link = createElement({
-                                             elem: 'a',
-                                             href: '#' + module.id + '/',
-                                             className: 'navbar-link',
-                                             textContent: module.title,
-                                             onclick: function (e) {
-                                                 Keeper.loadModule(module);
-                                                 this.blur();
-                                                 e.preventDefault();
-                                                 e.stopPropagation();
-                                                 return false;
-                                             }
-                                         });
+                    elem: 'a',
+                    href: '#' + module.id + '/',
+                    className: 'navbar-link',
+                    textContent: module.title,
+                    onclick: function (e) {
+                        Keeper.loadModule(module);
+                        this.blur();
+                        $(document.getElementById("CollapseableNavContainer")).collapse('hide');
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                    }
+                });
 
                 // Put the button in a li and add it to the navigation bar
                 createElement({
-                                  elem: 'li', inside: [link], putIn: NavigationBarLinks
-                              });
+                    elem: 'li', inside: [link], putIn: NavigationBarLinks
+                });
 
             }
         });

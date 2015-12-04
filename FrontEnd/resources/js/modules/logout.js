@@ -38,6 +38,7 @@ Keeper.createModule(function (Keeper) {
      */
     Module.display = function (ContentPane, parameters) {
         Keeper.data.logout().done(function () {
+            Keeper.showAlert('Successfully logged out.', 'success', 10000);
             Keeper.loadModule('welcome');
         }).fail(function (error) {
             console.log(error);
