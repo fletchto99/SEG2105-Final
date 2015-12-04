@@ -98,7 +98,6 @@ Keeper.createModule(function (Keeper) {
                     Keeper.data.update('begin-match', {
                         Match_ID: row.Match_ID
                     }).done(function() {
-                        console.log(Keeper.current_params);
                         Keeper.reloadModule(Keeper.current_params);
                     }).fail(function (data) {
                         Keeper.showAlert(data.message, 'danger');
@@ -136,7 +135,148 @@ Keeper.createModule(function (Keeper) {
                 text: 'Add Goal',
                 style: 'primary',
                 onclick: function (row) {
-                    Keeper.showAlert('Implement adding goals!', 'danger');
+
+                    var assisterSelect = createElement({
+                        elem: 'select',
+                        className: 'form-control',
+                        inside: [
+                            createElement({
+                                elem: 'option',
+                                disabled: true,
+                                selected: true,
+                                value: -1,
+                                textContent: 'Please choose a team to pick a goal scorer...'
+                            })
+                        ]
+                    });
+
+                    var playerSelect = createElement({
+                        elem: 'select',
+                        className: 'form-control',
+                        inside: [
+                            createElement({
+                                elem: 'option',
+                                disabled: true,
+                                selected: true,
+                                value: -1,
+                                textContent: 'Please choose a team to pick an assister...'
+                            })
+                        ]
+                    });
+
+                    var teamSelect = createElement({
+                        elem: 'select',
+                        className: 'form-control',
+                        inside: [
+                            createElement({
+                                elem: 'option',
+                                disabled: true,
+                                selected: true,
+                                value: -1,
+                                textContent: 'Select team'
+                            }),
+                            createElement({
+                                elem: 'option',
+                                value: row.Team_A_ID,
+                                textContent: row.Team_A_Name
+                            }),
+                            createElement({
+                                elem: 'option',
+                                value: row.Team_B_ID,
+                                textContent: row.Team_B_Name
+                            })
+                        ],
+                        onchange: function() {
+                            Keeper.data.get('players-in-team',{
+                                Team_ID: teamSelect.value
+                            }).done(function(teamData) {
+                                var data = teamData.Players;
+                                playerSelect.innerHTML = '';//remove all children
+                                assisterSelect.innerHTML = '';//remove all children
+
+                                createElement({
+                                    elem: 'option',
+                                    disabled: true,
+                                    selected: true,
+                                    value: -1,
+                                    textContent: 'Select goal scorer...',
+                                    putIn: playerSelect
+                                });
+
+                                createElement({
+                                    elem: 'option',
+                                    disabled: true,
+                                    selected: true,
+                                    value: -1,
+                                    textContent: 'Select assister...',
+                                    putIn: assisterSelect
+                                });
+
+                                createElement({
+                                    elem: 'option',
+                                    value: -1,
+                                    textContent: 'None',
+                                    putIn: assisterSelect
+                                });
+
+
+                                data.forEach(function(player) {
+                                    createElement({
+                                        elem: 'option',
+                                        value: player.Person_ID,
+                                        textContent: player.First_Name + " " + player.Last_Name,
+                                        putIn: playerSelect
+                                    });
+                                    createElement({
+                                        elem: 'option',
+                                        value: player.Person_ID,
+                                        textContent: player.First_Name + " " + player.Last_Name,
+                                        putIn: assisterSelect
+                                    });
+                                });
+                            }).fail(function(data) {
+                                Keeper.showAlert(data.message, 'danger');
+                            })
+                        }
+                    });
+
+                    Keeper.showModal('Add Goal', createElement({
+                        elem: 'div',
+                        inside: [
+                            teamSelect,
+                            playerSelect,
+                            assisterSelect
+                        ]
+                    }), 'Add', function () {
+                        if (playerSelect.value > -1) {
+                            Keeper.data.update('add-goal', {
+                                Match_ID: row.Match_ID,
+                                Player_ID: playerSelect.value,
+                                Assist_ID: assisterSelect.value > -1 ? assisterSelect.value : null
+                            }).done(function () {
+                                Keeper.hideModal();
+                            }).fail(function (data) {
+                                Keeper.showAlert(data.message, 'danger');
+                            })
+                        } else {
+                            Keeper.showAlert('You must choose a player who scored the goal!')
+                        }
+                    })
+                }
+            });
+
+            buttons.push({
+                title: 'End Match',
+                text: 'End',
+                style: 'danger',
+                onclick: function (row) {
+                    Keeper.data.update('end-match', {
+                        Match_ID: row.Match_ID
+                    }).done(function() {
+                        Keeper.reloadModule(Keeper.current_params);
+                    }).fail(function (data) {
+                        Keeper.showAlert(data.message, 'danger');
+                    })
                 }
             });
         }
@@ -160,7 +300,6 @@ Keeper.createModule(function (Keeper) {
     };
 
     Module.displayEndedMatches = function(matches, container) {
-        console.log(matches);
         Keeper.createTableFromData({
             data: matches,
             fields:[

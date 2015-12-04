@@ -62,7 +62,20 @@ Keeper.createModule(function (Keeper) {
                     if (parseInt(standings.Tournament_Type) == 0) {
                         Module.displayKOStandings(standings.knockout_matches, ContentPane);
                     } else if (parseInt(standings.Tournament_Type) == 1) {
-                        console.log(standings);
+                        Module.displayRRStandings(standings.roundrobin_matches, ContentPane);
+                    } else if (parseInt(standings.Tournament_Type) == 2) {
+                        createElement({
+                            elem: 'h2',
+                            textContent: 'Knockout Stage',
+                            putIn: ContentPane
+                        });
+                        Module.displayKOStandings(standings.knockout_matches, ContentPane);
+
+                        createElement({
+                            elem: 'h2',
+                            textContent: 'Roundrobin Stage',
+                            putIn: ContentPane
+                        });
                         Module.displayRRStandings(standings.roundrobin_matches, ContentPane);
                     }
                 }).fail(function (data) {

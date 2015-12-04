@@ -13,7 +13,7 @@ body {
     text-align: center;
 }
 
-input[type="text"], input[type="password"] {
+input[type="text"], input[type="password"]{
     margin: 5px 0;
     padding: 10px;
 }
@@ -24,4 +24,8 @@ th {
 
 .table {
     border: none !important;
+}
+
+select {
+    margin: 5px 0;
 }
