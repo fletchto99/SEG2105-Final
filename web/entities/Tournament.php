@@ -168,13 +168,13 @@ class Tournament extends Entity {
             $numRequired = Utils::getNextPowerSquared($numRegistered);
             $numRequired -= $numRegistered;
 
-            ApplicationError("Tournament", "You n^2 teams to perform a knockout style tournament! That means you need {$numRequired} more team(s)!");
+            ApplicationError("Tournament", "You need n^2 teams to perform a knockout style tournament! That means you need {$numRequired} more team(s)!");
         }
         if ($this->Tournament_Type == 0) {
             $this->createKnockoutMatches($numRegistered, $teams);
         } else if ($this->Tournament_Type == 1) {
             $this->createRoundRobinMatches($teams);
-        } else if($this->Tournament_Type) {
+        } else if($this->Tournament_Type == 2) {
             $this->createRoundRobinMatches($teams);
             $this->createKnockoutMatches(Utils::getPreviousPowerSquared($numRegistered));
         }

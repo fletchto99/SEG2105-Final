@@ -99,9 +99,9 @@ class Person extends Entity {
         $sql = "SELECT p.Person_ID, p.First_Name, p.Last_Name
                 FROM Persons p
                     LEFT JOIN Logins l ON p.Person_ID = l.Person_ID
-                WHERE Login_ID = null";
+                WHERE Login_ID IS NULL";
         if ($no_team_assigned) {
-            $sql .= " AND p.Team_ID = null";
+            $sql .= " AND p.Team_ID IS NULL";
         }
         $sth = $dbh->prepare($sql);
         $sth -> execute();
