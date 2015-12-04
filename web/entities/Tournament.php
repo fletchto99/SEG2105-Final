@@ -163,7 +163,7 @@ class Tournament extends Entity {
             ApplicationError("Tournament","A tournament requires a valid type before it can begin!");
         }
 
-        if (($this->Tournament_Type == 0 || $this->Tournament_Type == 2) && !Utils::isPowerOfTwo($numRegistered)) {
+        if ($this->Tournament_Type == 0 && !Utils::isPowerOfTwo($numRegistered)) {
 
             $numRequired = Utils::getNextPowerSquared($numRegistered);
             $numRequired -= $numRegistered;
