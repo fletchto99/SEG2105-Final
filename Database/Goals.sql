@@ -14,7 +14,7 @@
 CREATE TABLE IF NOT EXISTS `Goals` (
   `Goal_ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Player_ID` int(10) unsigned NOT NULL,
-  `Assist_ID` int(10) unsigned NOT NULL,
+  `Assist_ID` int(10) unsigned DEFAULT NULL,
   `Match_ID` int(10) unsigned NOT NULL,
   `Team_ID` int(10) unsigned NOT NULL,
   `Last_Update_Datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
