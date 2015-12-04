@@ -89,6 +89,25 @@ class Person extends Entity {
         return self::$user;
     }
 
+    public static function getOTFPlayers($no_team_assigned = false) {
+        $user = Person::user();
+        if($user->Role_Name != 'Organizer') {
+            ApplicationError("Permissions", "You must be a tournament organizer to view all manual players");
+        }
+
+        $dbh = DataBase::getInstance();
+        $sql = "SELECT p.Person_ID, p.First_Name, p.Last_Name
+                FROM Persons p
+                    LEFT JOIN Logins l ON p.Person_ID = l.Person_ID
+                WHERE Login_ID = null";
+        if ($no_team_assigned) {
+            $sql .= " AND p.Team_ID = null";
+        }
+        $sth = $dbh->prepare($sql);
+        $sth -> execute();
+        return new Entity(['Players'=>$sth->fetchAll()]);
+    }
+
     /**
      * Attempts to create a user with the username and password specified in the entity
      *
@@ -247,7 +266,7 @@ class Person extends Entity {
         $sth = $dbh->prepare($sql);
         $sth->execute([$number, $this->Person_ID]);
         $this->Jersey_Number = $number;
-        return new Entity(['Success'=>"Player number changed to {$number}"]);
+        return new Entity(['Success'=>"Jersey number changed to {$number}", 'Number' => $this->Jersey_Number]);
     }
 
     public function leaveTeam() {
