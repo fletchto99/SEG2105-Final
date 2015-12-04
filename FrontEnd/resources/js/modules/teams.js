@@ -63,23 +63,40 @@ Keeper.createModule(function (Keeper) {
                 Keeper.showAlert(data.message, 'danger');
             });
         } else {
+
             createElement({
                 elem: 'h1',
                 textContent: 'All Teams',
                 putIn: ContentPane
             });
+
+            if (Keeper.hasRole('Organizer')) {
+                createElement({
+                    elem: 'button',
+                    className: 'btn-inline btn btn-primary',
+                    textContent: 'Create Player',
+                    onclick: function () {
+                        Module.createPlayer();
+                    },
+                    putIn: ContentPane
+                });
+
+                createElement({
+                    elem: 'button',
+                    className: 'btn-inline btn btn-primary',
+                    textContent: 'Create Team',
+                    onclick: function () {
+                        Module.createTeam();
+                    },
+                    putIn: ContentPane
+                })
+            }
+
             Keeper.data.get('teams').done(function (data) {
                 Module.buildTeamsTable(data.Teams, ContentPane);
             }).fail(function (data) {
                 Keeper.showAlert(data.message, 'danger');
             });
-        }
-
-
-        if (Keeper.hasRole('Organizer')) {
-
-        } else {
-
         }
 
         return true;
@@ -110,7 +127,16 @@ Keeper.createModule(function (Keeper) {
                 onclick: function (row) {
                     Keeper.showAlert('Implement this!!', 'danger');
                 }
-            })
+            });
+        } else if (Keeper.hasRole('Organizer') && tournament == undefined) {
+            buttons.push({
+                title: 'Add Player',
+                text: 'Add Player',
+                style: 'success',
+                onclick: function (row) {
+                    Keeper.showAlert('Implement this!!', 'danger');
+                }
+            });
         }
         Keeper.createTableFromData({
             data: teams,
@@ -127,6 +153,129 @@ Keeper.createModule(function (Keeper) {
             buttons: buttons,
             putIn: container
         });
+    };
+
+    Module.createTeam = function () {
+        Keeper.data.get('manual-players', {
+            No_Team_Assigned: true
+        }).done(function (data) {
+            if (data.Players.length > 0) {
+                var teamNameInput = createElement({
+                    elem: 'input',
+                    type: 'text',
+                    className: 'form-control',
+                    attributes: {
+                        placeHolder: 'Team Name',
+                        required: '',
+                        autofocus: ''
+                    }
+                });
+
+                var playerOptions = [createElement({
+                    elem: 'option',
+                    disabled: true,
+                    selected: true,
+                    value: -1,
+                    textContent: 'Select team captain'
+                })];
+
+
+
+                data.Players.forEach(function(player) {
+                    playerOptions.push(createElement({
+                        elem: 'option',
+                        value: player.Person_ID,
+                        textContent: player.First_Name + " " + player.Last_Name
+                    }));
+                });
+
+                var playerSelect = createElement({
+                    elem: 'select',
+                    className: 'form-control',
+                    inside: playerOptions
+                });
+                Keeper.showModal('Create Player', createElement({
+                    elem: 'div',
+                    inside: [
+                        teamNameInput,
+                        playerSelect
+                    ]
+                }), 'Create', function () {
+                    if (playerSelect.value > -1) {
+                        Keeper.data.update('create-team', {
+                            Team_Name: teamNameInput.value,
+                            Captain_ID: playerSelect.value,
+                        }).done(function (data) {
+                            Keeper.reloadModule(Keeper.current_params);
+                            Keeper.showAlert('Team created!', 'success')
+                        }).fail(function (data) {
+                            Keeper.showAlert(data.message, 'danger')
+                        });
+                    } else {
+                        Keeper.showAlert('Please select a team captain!', 'warning');
+                    }
+                })
+            } else {
+                Keeper.showAlert('There are no free players to be the team captain! Please create a player first!', 'warning');
+            }
+        }).fail(function (data) {
+            Keeper.showAlert(data.message, 'danger');
+        });
+
+    };
+
+    Module.createPlayer = function () {
+        var firstnameInput = createElement({
+            elem: 'input',
+            type: 'text',
+            className: 'form-control',
+            attributes: {
+                placeHolder: 'First Name',
+                required: '',
+                autofocus: ''
+            }
+        });
+
+        var lastnameInput = createElement({
+            elem: 'input',
+            type: 'text',
+            className: 'form-control',
+            attributes: {
+                placeHolder: 'Last Name',
+                required: ''
+            }
+        });
+
+        var jerseyNumberInput = createElement({
+            elem: 'input',
+            type: 'text',
+            className: 'form-control',
+            attributes: {
+                placeHolder: 'Jersey Number',
+                required: ''
+            }
+        });
+
+        Keeper.showModal('Create Player', createElement({
+            elem: 'div',
+            inside: [
+                firstnameInput,
+                lastnameInput,
+                jerseyNumberInput
+            ]
+        }), 'Create', function () {
+            Keeper.data.update('create-player', {
+                First_Name: firstnameInput.value,
+                Last_Name: lastnameInput.value,
+                Jersey_Number: jerseyNumberInput.value
+            }).done(function (data) {
+                Keeper.hideModal();
+                Keeper.showAlert('Player created!', 'success')
+            }).fail(function (data) {
+                Keeper.showAlert(data.message, 'danger')
+            });
+
+        })
     };
 
     return Module;

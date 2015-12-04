@@ -29,3 +29,7 @@ th {
 select {
     margin: 5px 0;
 }
+
+.btn-inline {
+    margin: 5px;
+}
