@@ -42,34 +42,78 @@ Keeper.createModule(function (Keeper) {
             return false;
         }
 
-        if (!parameters[0]) {
-            Keeper.showAlert('A tournament is required to show standings', 'danger');
+        if (parameters.length < 2) {
+            Keeper.showAlert('Incorrect parameters', 'danger');
             return false;
         }
 
-        Keeper.data.get('tournament', {
-            Tournament_ID: parameters[0]
-        }).done(function(tournament) {
-            createElement({
-                elem: 'h1',
-                textContent: 'Standings for ' + tournament.Tournament_Name,
-                putIn: ContentPane
-            });
-            Keeper.data.get('tournament-standings', {
-                Tournament_ID: tournament.Tournament_ID
-            }).done(function(standings) {
-                if (parseInt(standings.Tournament_Type) == 0) {
-                    Module.displayKOStandings(standings.knockout_matches, ContentPane);
-                } else if (parseInt(standings.Tournament_Type) == 1) {
-                    console.log(standings);
-                    Module.displayRRStandings(standings.roundrobin_matches, ContentPane);
-                }
-            }).fail(function() {
+        if (parameters[0] == 'tournament') {
+            Keeper.data.get('tournament', {
+                Tournament_ID: parameters[1]
+            }).done(function (tournament) {
+                createElement({
+                    elem: 'h1',
+                    textContent: 'Standings for tournament: ' + tournament.Tournament_Name,
+                    putIn: ContentPane
+                });
+                Keeper.data.get('tournament-standings', {
+                    Tournament_ID: tournament.Tournament_ID
+                }).done(function (standings) {
+                    if (parseInt(standings.Tournament_Type) == 0) {
+                        Module.displayKOStandings(standings.knockout_matches, ContentPane);
+                    } else if (parseInt(standings.Tournament_Type) == 1) {
+                        console.log(standings);
+                        Module.displayRRStandings(standings.roundrobin_matches, ContentPane);
+                    }
+                }).fail(function (data) {
+                    Keeper.showAlert(data.message, 'danger');
+                })
+            }).fail(function (data) {
                 Keeper.showAlert(data.message, 'danger');
-            })
-        }).fail(function(data) {
-            Keeper.showAlert(data.message, 'danger');
-        });
+            });
+        } else if (parameters[0] =='team') {
+            Keeper.data.get('team', {
+                Team_ID: parameters[1]
+            }).done(function (team) {
+                if (parameters.length == 3) {
+                    Keeper.data.get('tournament', {
+                        Tournament_ID: parameters[2]
+                    }).done(function (tournament) {
+                        createElement({
+                            elem: 'h1',
+                            textContent: 'Standings for team ' + team.Team_Name + ' in tournament ' + tournament.Tournament_Name,
+                            putIn: ContentPane
+                        });
+                        Keeper.data.get('team-standings', {
+                            Team_ID: team.Team_ID,
+                            Tournament_ID: tournament.Tournament_ID
+                        }).done(function (standings) {
+                            Module.displayTeamStandings(standings.standings, ContentPane);
+                        }).fail(function (data) {
+                            Keeper.showAlert(data.message, 'danger');
+                        })
+                    }).fail(function() {
+                        Keeper.showAlert(data.message, 'danger');
+                    });
+                } else {
+                    createElement({
+                        elem: 'h1',
+                        textContent: 'Standings for team: ' + team.Team_Name,
+                        putIn: ContentPane
+                    });
+                    Keeper.data.get('team-standings', {
+                        Team_ID: team.Team_ID
+                    }).done(function (standings) {
+                        Module.displayTeamStandings(standings.standings, ContentPane);
+                    }).fail(function (data) {
+                        Keeper.showAlert(data.message, 'danger');
+                    })
+                }
+            });
+        } else {
+            Keeper.showAlert('Incorrect parameters!');
+            return false;
+        }
 
         return true;
     };
@@ -133,6 +177,33 @@ Keeper.createModule(function (Keeper) {
                 {
                     title: 'Matches Played',
                     key: 'Matches_Played'
+                }
+            ],
+            putIn: container
+        });
+    };
+
+    Module.displayTeamStandings = function(standings, container) {
+        var i = 1;
+        standings.forEach(function(standings) {
+            standings.Position = i;
+            standings.Player_Name = standings.First_Name + " " + standings.Last_Name;
+            i++;
+        });
+        Keeper.createTableFromData({
+            data: standings,
+            fields: [
+                {
+                    title: 'Position',
+                    key: 'Position'
+                },
+                {
+                    title: 'Player',
+                    key: 'Player_Name'
+                },
+                {
+                    title: 'Goals Scored',
+                    key: 'Goals_Scored'
                 }
             ],
             putIn: container

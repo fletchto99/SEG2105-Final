@@ -108,7 +108,7 @@ Keeper.createModule(function (Keeper) {
                             Module.beginTournament(row);
                         }
                     });
-                } else if (Keeper.hasRole('Player') && Keeper.user.Team !== null && Keeper.user.Team.Captain_ID == Keeper.user.Person_ID) {
+                } else if (Keeper.hasRole('Player') && Keeper.user.Team != null && Keeper.user.Team.Captain_ID == Keeper.user.Person_ID) {
                     pregameButtons.push({
                         title: 'Join Tournament',
                         text: 'Join',
@@ -155,7 +155,7 @@ Keeper.createModule(function (Keeper) {
                     text: 'Matches',
                     style: 'primary',
                     onclick: function(row) {
-                        Keeper.showAlert('Implement this!!', 'danger');
+                        Keeper.loadModule('matches', [row.Tournament_ID]);
                     }
                 }];
 
@@ -221,7 +221,7 @@ Keeper.createModule(function (Keeper) {
                             text: 'Matches',
                             style: 'primary',
                             onclick: function (row) {
-                                Keeper.showAlert('Implement this!!', 'danger');
+                                Keeper.loadModule('matches', [row.Tournament_ID]);
                             }
                         },
                         {
@@ -229,7 +229,7 @@ Keeper.createModule(function (Keeper) {
                             text: 'Standings',
                             style: 'primary',
                             onclick: function (row) {
-                                Keeper.loadModule('standings',[row.Tournament_ID])
+                                Keeper.loadModule('standings',['tournament', row.Tournament_ID])
                             }
                         }
                     ],
@@ -376,6 +376,8 @@ Keeper.createModule(function (Keeper) {
                     }).fail(function (data) {
                         Keeper.showAlert(data.message, 'danger');
                     })
+                } else {
+                    Keeper.showAlert('You must select a team before you can add to the tournament', 'warning');
                 }
             });
 

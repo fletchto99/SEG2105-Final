@@ -55,7 +55,7 @@ Keeper.createModule(function (Keeper) {
                 Keeper.data.get('teams-in-tournament', {
                     Tournament_ID: parameters[0]
                 }).done(function (data) {
-                    Module.buildTeamsTable(data.Teams, ContentPane);
+                    Module.buildTeamsTable(data.Teams, ContentPane, parameters[0]);
                 }).fail(function (data) {
                     Keeper.showAlert(data.message, 'danger');
                 });
@@ -85,7 +85,8 @@ Keeper.createModule(function (Keeper) {
         return true;
     };
 
-    Module.buildTeamsTable = function (teams, container) {
+    Module.buildTeamsTable = function (teams, container, tournament) {
+
         teams.forEach(function (team) {
             team.Captain = team.Captain_First_Name + " " + team.Captain_Last_Name;
         });
@@ -94,7 +95,11 @@ Keeper.createModule(function (Keeper) {
             text: 'Statistics',
             style: 'primary',
             onclick: function (row) {
-                Keeper.showAlert('Implement this!!', 'danger');
+                if (tournament) {
+                    Keeper.loadModule('standings', ['team', row.Team_ID, tournament]);
+                } else {
+                    Keeper.loadModule('standings', ['team', row.Team_ID]);
+                }
             }
         }];
         if (Keeper.hasRole('Player') && Keeper.user.Team == null) {

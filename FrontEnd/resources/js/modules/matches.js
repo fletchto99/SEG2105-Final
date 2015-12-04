@@ -52,17 +52,20 @@ Keeper.createModule(function (Keeper) {
         }).done(function (tournament) {
             createElement({
                 elem: 'h1',
-                textContent: 'Standings for ' + tournament.Tournament_Name,
+                textContent: 'Matches in ' + tournament.Tournament_Name,
                 putIn: ContentPane
             });
-            Keeper.data.get('tournament-standings', {
+            Keeper.data.get('matches-in-tournament', {
                 Tournament_ID: tournament.Tournament_ID
-            }).done(function (standings) {
-                if (parseInt(standings.Tournament_Type) == 0) {
-                    Module.displayKOStandings(standings.knockout_matches, ContentPane);
-                } else if (parseInt(standings.Tournament_Type) == 1) {
-                    console.log(standings);
-                    Module.displayRRStandings(standings.roundrobin_matches, ContentPane);
+            }).done(function (matches) {
+                if (matches.pregame.length > 0) {
+                    Module.displayPregameMatches(matches.pregame, ContentPane);
+                }
+                if (matches.inprogress.length > 0) {
+                    Module.displayInprogressMatches(matches.inprogress, ContentPane);
+                }
+                if (matches.over.length > 0) {
+                    Module.displayEndedMatches(matches.over, ContentPane);
                 }
             }).fail(function () {
                 Keeper.showAlert(data.message, 'danger');
@@ -74,14 +77,93 @@ Keeper.createModule(function (Keeper) {
         return true;
     };
 
-    Module.displayKOStandings = function (matches, container) {
+    Module.displayPregameMatches = function(matches, container) {
+        matches.forEach(function(match) {
+            if (match.Team_A_Name == null) {
+                match.Team_A_Name = "Not yet decided!"
+            }
+            if (match.Team_B_Name == null) {
+                match.Team_B_Name = "Not yet decided!"
+            }
+        });
+
+        var buttons = [];
+
+        if (Keeper.hasRole('Organizer')) {
+            buttons.push({
+                title: 'Begin Match',
+                text: 'Begin',
+                style: 'primary',
+                onclick: function (row) {
+                    Keeper.data.update('begin-match', {
+                        Match_ID: row.Match_ID
+                    }).done(function() {
+                        console.log(Keeper.current_params);
+                        Keeper.reloadModule(Keeper.current_params);
+                    }).fail(function (data) {
+                        Keeper.showAlert(data.message, 'danger');
+                    })
+                }
+            });
+        }
+
         Keeper.createTableFromData({
             data: matches,
-            fields: [
+            fields:[
                 {
-                    title: 'Round',
-                    key: 'Round'
+                    title: 'Team A',
+                    key: 'Team_A_Name'
                 },
+                {
+                    title: 'Team B',
+                    key: 'Team_B_Name'
+                }
+            ],
+            buttons:buttons,
+            putIn: container
+        })
+
+    };
+
+
+    Module.displayInprogressMatches = function(matches, container) {
+
+        var buttons = [];
+
+        if (Keeper.hasRole('Organizer')) {
+            buttons.push({
+                title: 'Add Goal',
+                text: 'Add Goal',
+                style: 'primary',
+                onclick: function (row) {
+                    Keeper.showAlert('Implement adding goals!', 'danger');
+                }
+            });
+        }
+
+        Keeper.createTableFromData({
+            data: matches,
+            fields:[
+                {
+                    title: 'Team A',
+                    key: 'Team_A_Name'
+                },
+                {
+                    title: 'Team B',
+                    key: 'Team_B_Name'
+                }
+            ],
+            buttons:buttons,
+            putIn: container
+        })
+
+    };
+
+    Module.displayEndedMatches = function(matches, container) {
+        console.log(matches);
+        Keeper.createTableFromData({
+            data: matches,
+            fields:[
                 {
                     title: 'Winner',
                     key: 'Winning_Team_Name'
@@ -95,48 +177,9 @@ Keeper.createModule(function (Keeper) {
                     key: 'Team_B_Name'
                 }
             ],
-            buttons: [
-                {
-                    title: 'Match Details',
-                    text: 'Details',
-                    style: 'primary',
-                    onclick: function (row) {
-                        Keeper.showAlert('Implement this!!', 'danger');
-                    }
-                }
-            ],
             putIn: container
-        });
-    };
+        })
 
-    Module.displayRRStandings = function (standings, container) {
-        var i = 1;
-        standings.forEach(function (standings) {
-            standings.Position = i;
-            i++;
-        });
-        Keeper.createTableFromData({
-            data: standings,
-            fields: [
-                {
-                    title: 'Position',
-                    key: 'Position'
-                },
-                {
-                    title: 'Team',
-                    key: 'Team_Name'
-                },
-                {
-                    title: 'Matches Won',
-                    key: 'Matches_Won'
-                },
-                {
-                    title: 'Matches Played',
-                    key: 'Matches_Played'
-                }
-            ],
-            putIn: container
-        });
     };
 
 
