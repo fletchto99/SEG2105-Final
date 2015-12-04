@@ -254,6 +254,7 @@ Keeper.createModule(function (Keeper) {
                                 Player_ID: playerSelect.value,
                                 Assist_ID: assisterSelect.value > -1 ? assisterSelect.value : null
                             }).done(function () {
+                                Keeper.showAlert('Goal added', 'success', 5000);
                                 Keeper.hideModal();
                             }).fail(function (data) {
                                 Keeper.showAlert(data.message, 'danger');

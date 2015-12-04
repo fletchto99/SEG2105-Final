@@ -108,12 +108,13 @@ Keeper.createModule(function (Keeper) {
                             Module.beginTournament(row);
                         }
                     });
-                } else if (Keeper.hasRole('Player') && Keeper.user.Team != null && Keeper.user.Team.Captain_ID == Keeper.user.Person_ID) {
+                } else if (Keeper.hasRole('Player')) {//&& Keeper.user.Team != null && Keeper.user.Team.Captain_ID == Keeper.user.Person_ID
                     pregameButtons.push({
                         title: 'Join Tournament',
                         text: 'Join',
                         style: 'success',
                         onclick: function (row) {
+                            Keeper.showAlert('Not yet implemented :( sorry', 'warning');
                         }
                     });
                 }
