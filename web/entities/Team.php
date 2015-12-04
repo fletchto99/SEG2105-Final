@@ -169,7 +169,6 @@ class Team extends Entity {
         $results->addToData(['Team_ID'=>$this->Team_ID]);
         $dbh = Database::getInstance();
 
-        //TODO: Flawed logic, will only return players which have scores goals, should put players who haven't scored on the bottom, sorted by name or something
         if (isset($tournament)) {
             $sql = "SELECT g.Player_ID, count(*) as Goals_Scored, p.First_Name, p.Last_Name
                     FROM Goals g

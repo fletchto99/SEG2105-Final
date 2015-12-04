@@ -64,6 +64,11 @@ class Match extends Entity {
         if (!isset($player->Team_ID) || $player->Team_ID === null || ($player->Team_ID != $this->Team_A_ID && $player->Team_ID != $this->Team_B_ID)) {
             ApplicationError("Goal", "Only players who are participating in the match can score goals!");
         }
+
+        if (isset($assister) && $player->Person_ID == $assister->Person_ID) {
+            ApplicationError("Goal", "The assister can't also be the goal scorer!");
+        }
+
         $sql = "INSERT INTO Goals(Match_ID, Player_ID, Assist_ID, Team_ID)
                 VALUES (?,?,?,?)";
         $dbh = Database::getInstance();
@@ -166,10 +171,39 @@ class Match extends Entity {
                     WHERE Tournament_ID=?
                         AND Round=null";
             $sth = $dbh->prepare($sql);
-            $sth->execute([$tournament->Torunament_ID]);
+            $sth->execute([$tournament->Tournament_ID]);
             $results = $sth->fetch();
-            if (intval($results['count']) < 1) {
-                ApplicationError("Implementation", "The knockout part is not yet implemented :(");
+
+            $sql = "SELECT COUNT(*) as count
+                    FROM Matches
+                    WHERE Tournament_ID=?
+                        AND Round=1
+                        AND Team_A_ID is null
+                        AND Team_B_ID is null";
+            $sth = $dbh->prepare($sql);
+            $sth->execute([$tournament->Tournament_ID]);
+            $results2 = $sth->fetch();
+            if (intval($results['count']) < 1 && intval($results2['count']) > 0) {
+                $rrStandings = $tournament->calcRRStats();
+
+                $sql = "SELECT Match_ID
+                        FROM Matches
+                        WHERE Round=1
+                            AND Tournament_ID=?";
+                $sth = $dbh->prepare($sql);
+                $sth->execute([$tournament->Tournament_ID]);
+                $resultSet = $sth->fetchAll();
+
+                $offset = 0;
+                foreach($resultSet as $result) {
+                    $sql = "UPDATE Matches
+                            SET Team_A_ID = ?,
+                                Team_B_ID = ?
+                            WHERE Match_ID = ?";
+                    $sth = $dbh->prepare($sql);
+                    $sth->execute([$rrStandings[$offset]->Team_ID,$rrStandings[$offset+1]->Team_ID,$result['Match_ID']]);
+                    $offset+= 2;
+                }
             }
         }
 

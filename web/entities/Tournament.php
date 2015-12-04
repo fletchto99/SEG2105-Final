@@ -317,7 +317,7 @@ class Tournament extends Entity {
         return $result;
     }
 
-    private function calcRRStats() {
+    public function calcRRStats() {
         $dbh = Database::getInstance();
         $teams = $this->getTeams()->Teams;
         $standings = [];
@@ -355,7 +355,7 @@ class Tournament extends Entity {
         return $standings;
     }
 
-    private function calcKOStats() {
+    public function calcKOStats() {
         $dbh = Database::getInstance();
         $sql = "SELECT m.Match_ID, m.Winning_Team_ID, m.Team_A_ID, m.Team_B_ID, m.Round, Team_A.Team_Name as Team_A_Name, Team_B.Team_Name as Team_B_Name, Winning_Team.Team_Name as Winning_Team_Name
                     FROM Matches m
