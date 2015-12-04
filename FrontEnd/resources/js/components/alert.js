@@ -15,7 +15,7 @@
                 exit: 'animated rollOut'
             },
             z_index: 99999999,
-            delay: dismissAfter
+            delay: dismissAfter || 0
         });
     };
 

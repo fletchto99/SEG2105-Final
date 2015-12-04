@@ -42,6 +42,71 @@ Keeper.createModule(function (Keeper) {
             return false;
         }
 
+        createElement({
+            elem: 'h1',
+            textContent: 'Welcome ' + Keeper.user.First_Name,
+            putIn: ContentPane
+        });
+
+        if (Keeper.hasRole('Organizer')) {
+
+        } else {
+            if (Keeper.user.Jersey_Number == null) {
+                createElement({
+                    elem: 'p',
+                    textContent: 'Welcome to tournament maker, ' + Keeper.user.First_Name + '! We noticed your jersey number is not set. Please use the button below to set your jersey number before you join a team!',
+                    putIn: ContentPane
+                });
+            } else if (Keeper.user.Team_ID == null) {
+                createElement({
+                    elem: 'p',
+                    textContent: 'Welcome to tournament maker, ' + Keeper.user.First_Name + '! We noticed you are not part of a team yet. Before you are able to join a tournament you must be a member of a team. Please go to the teams page to create or join a team.',
+                    putIn: ContentPane
+                });
+            } else {
+                createElement({
+                    elem: 'p',
+                    textContent: 'Welcome to tournament maker, ' + Keeper.user.First_Name + '! This page will soon server as your personal portal.',
+                    putIn: ContentPane
+                });
+            }
+            var jerseyNumberInput = createElement({
+                elem: 'input',
+                type: 'number',
+                className: 'form-control',
+                value: Keeper.user.Jersey_Number,
+                attributes: {
+                    placeHolder: 'Jersey Number',
+                    required: '',
+                    autofocus: '',
+                    minValue: 0
+                }
+            });
+            createElement({
+                elem: 'button',
+                textContent: 'Update Jersey Number',
+                className: 'block-btn btn btn-info btn-lg',
+                onclick: function () {
+                    Keeper.showModal('Update Jersey Number', jerseyNumberInput,
+                        Keeper.user.Jersey_Number == null ? 'Set' : 'Update',
+                        function () {
+                            Keeper.data.update('player-number',{
+                                Jersey_Number: jerseyNumberInput.value
+                            }).done(function (data) {
+                                console.log(data);
+                                Keeper.user.Jersey_Number = data.number;
+                                Keeper.showAlert(data.Success, 'info', 10000);
+                                Keeper.hideModal();
+                            }).fail(function (error) {
+                                Keeper.showAlert(error.message, 'danger');
+                            });
+                        });
+                    return false
+                },
+                putIn: ContentPane
+            });
+        }
+
         return true;
     };
 

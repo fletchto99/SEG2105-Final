@@ -129,7 +129,7 @@ Keeper.createModule(function (Keeper) {
         createElement({
             elem: 'button',
             textContent: 'Login',
-            className: 'welcomebtn btn btn-info btn-lg',
+            className: 'block-btn welcomebtn btn btn-info btn-lg',
             onclick: function () {
                 Keeper.showModal('Login', loginForm,
                     'Login',
@@ -150,7 +150,7 @@ Keeper.createModule(function (Keeper) {
         createElement({
             elem: 'button',
             textContent: 'Create User',
-            className: 'welcomebtn btn btn-info btn-lg',
+            className: 'block-btn welcomebtn btn btn-info btn-lg',
             onclick: function () {
                 Keeper.showModal('Create Account', createAccountForm,
                     'Login',

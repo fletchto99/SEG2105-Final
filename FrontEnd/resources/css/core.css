@@ -2,12 +2,18 @@ body {
     margin: 0 auto;
 }
 
-.table th{
-    text-align: center;
+.block-btn {
+    display: block;
+    margin: 10px auto;
 }
 
 #ContentPane {
     margin-top: 75px;
     max-width: 1000px;
     text-align: center;
+}
+
+input[type="text"], input[type="password"] {
+    margin: 5px 0px;
+    padding: 10px;
 }
