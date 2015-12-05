@@ -198,8 +198,8 @@ class Tournament extends Entity {
         $mid = sizeof($teamsRotated) / 2;
         do {
             for ($i = 0; $i < $mid; $i++) {
-                if ($teamsRotated[$i] !== null && $teamsRotated[$i+$mid] !== null) {
-                    array_push($matches, ['Team_A_ID' => $teamsRotated[$i]['Team_ID'], 'Team_B_ID' => $teamsRotated[$i + $mid]['Team_ID']]);
+                if ($teamsRotated[$i] !== null && $teamsRotated[(2 * $mid) - ($i+1)] !== null) {
+                    array_push($matches, ['Team_A_ID' => $teamsRotated[$i]['Team_ID'], 'Team_B_ID' => $teamsRotated[(2*$mid) - ($i + 1)]['Team_ID']]);
                 }
             }
             $teamsRotated = Utils::rotateArray($teamsRotated);
@@ -249,13 +249,14 @@ class Tournament extends Entity {
     public function getMatches() {
         $matches = new Entity();
         $dbh = Database::getInstance();
-        $sql = "SELECT m.Match_ID, m.Team_A_ID, m.Team_B_ID, a.Team_Name as Team_A_Name, b.Team_Name as Team_B_Name, m.Winning_Team_ID, w.Team_Name as Winning_Team_Name
+        $sql = "SELECT m.Match_ID, m.Team_A_ID, m.Team_B_ID, a.Team_Name as Team_A_Name, b.Team_Name as Team_B_Name, m.Winning_Team_ID, w.Team_Name as Winning_Team_Name, m.Round
                 FROM Matches m
                     LEFT JOIN Teams a ON a.Team_ID = m.Team_A_ID
                     LEFT JOIN Teams b ON b.Team_ID = m.Team_B_ID
                     LEFT JOIN Teams w ON w.Team_ID = m.Winning_Team_ID
                 WHERE m.Tournament_ID = ?
-                AND m.Status = ?";
+                AND m.Status = ?
+                ORDER BY Round ASC";
         $sth = $dbh->prepare($sql);
         $sth->execute([$this->Tournament_ID, 0]);
         $matches->addToData(['pregame'=> $sth->fetchAll()]);
@@ -342,6 +343,7 @@ class Tournament extends Entity {
                     WHERE (Team_A_ID = ? OR Team_B_ID = ?)
                     AND Tournament_ID = ?
                     AND Round IS NULL
+                    AND Status = 2
                     ORDER BY Round DESC";
             $sth = $dbh->prepare($sql);
             $sth->execute([$team['Team_ID'], $team['Team_ID'], $this->Tournament_ID]);

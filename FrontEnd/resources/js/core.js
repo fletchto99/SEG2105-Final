@@ -258,7 +258,12 @@
 
             if (!loaded_ok) {
                 console.log("Module failed to display dynamic content, displaying internal error overlay");
-                Keeper.loadModule('welcome');
+                if (Keeper.PreviousModule) {
+                    Keeper.loadModule(Keeper.PreviousModule.id);
+                } else {
+                    Keeper.loadModule('main');
+                }
+
             }
         };
 
@@ -359,10 +364,6 @@
      */
     Keeper.showNavBar = function () {
         $(document.getElementById("NavigationBar")).fadeIn();
-    };
-
-    Keeper.error = function (errorMessage) {
-        alert(errorMessage);
     };
 
 })();

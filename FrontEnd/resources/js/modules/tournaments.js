@@ -151,7 +151,14 @@ Keeper.createModule(function (Keeper) {
                     onclick: function (row) {
                         Keeper.loadModule('teams', [row.Tournament_ID]);
                     }
-                },{
+                }, {
+                    title: 'View Standings',
+                    text: 'Standings',
+                    style: 'primary',
+                    onclick: function (row) {
+                        Keeper.loadModule('standings', ['tournament', row.Tournament_ID]);
+                    }
+                }, {
                     title: 'View Matches',
                     text: 'Matches',
                     style: 'primary',

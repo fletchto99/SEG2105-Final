@@ -1,6 +1,12 @@
 (function () {
     'use strict';
 
+    window.onkeyup = function (e) {
+        if (e.which == 13 && Keeper.modalOpen == true) {
+            document.getElementById('ModalButton').onclick();
+        }
+    };
+
     Keeper.showModal = function (modalTitle, modalContent, buttonTitle, onSubmit) {
         var modal = $('#MainModal');
         modal.modal({
@@ -17,13 +23,17 @@
                 dismiss = onSubmit();
             }
             dismiss && modal.modal('hide');
-            event.preventDefault();
+            if (event) {
+                event.preventDefault();
+            }
         };
         modal.modal('show');
+        Keeper.modalOpen = true;
     };
 
     Keeper.hideModal = function() {
         $('#MainModal').modal('hide');
+        Keeper.modalOpen = false;
     }
 
 })();

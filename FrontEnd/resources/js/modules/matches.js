@@ -110,6 +110,10 @@ Keeper.createModule(function (Keeper) {
             data: matches,
             fields:[
                 {
+                    title: 'Round',
+                    key: 'Round'
+                },
+                {
                     title: 'Team A',
                     key: 'Team_A_Name'
                 },
@@ -286,6 +290,10 @@ Keeper.createModule(function (Keeper) {
             data: matches,
             fields:[
                 {
+                    title: 'Round',
+                    key: 'Round'
+                },
+                {
                     title: 'Team A',
                     key: 'Team_A_Name'
                 },
@@ -304,6 +312,10 @@ Keeper.createModule(function (Keeper) {
         Keeper.createTableFromData({
             data: matches,
             fields:[
+                {
+                    title: 'Round',
+                    key: 'Round'
+                },
                 {
                     title: 'Winner',
                     key: 'Winning_Team_Name'
