@@ -1,6 +1,6 @@
 <?php
 /**
- * Logs the current user out
+ * Logs the current user out by killing their PHP session
  */
 
 require_once __DIR__ . '/../bootstrap.php';

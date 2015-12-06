@@ -1,7 +1,7 @@
 <?php
 /**
- *  Details     :  A class to manage database interactions and data I/O
- *  Author(s)   :  Will Thompson, Kurt Bruneau, Matt Langlois
+ *  Details     :  A class to manage database interactions and data I/O. Taken from one of my previous projects
+ *  Author(s)   :   Matt Langlois, Kurt Bruneau
  *
  */
 
@@ -11,7 +11,7 @@ require_once 'Database.php';
 class Entity implements JsonSerializable {
 
     /*
-     * An associative array containing all of the data of the entity
+     * An associative array containing all of the entities' data
      */
     protected $data;
 
@@ -30,7 +30,7 @@ class Entity implements JsonSerializable {
             ApplicationError('Bad Request', 'Request is not a JSON request');
         }
 
-        $this->data = json_decode(file_get_contents('php://input'), true); // True is so we get it as an array instead of as stdClass
+        $this->data = json_decode(file_get_contents('php://input'), true); // True is so we get it as an associative array instead of as stdClass
         return $this;
     }
 
@@ -44,7 +44,7 @@ class Entity implements JsonSerializable {
     }
 
     /**
-     * Ensures the entity contains all of the required fields.
+     * Ensures the entity contains all of the required fields. Throws an exception if the entity is not validated
      *
      * @param array $expected_keys The required keys for the entity
      */
@@ -112,6 +112,7 @@ class Entity implements JsonSerializable {
             return $this->data[$key];
         }
 
+        //Throw a useful error for developers
         $trace = debug_backtrace();
         ApplicationError("entity",
             "Attempted to access undefined member '" . $key .

@@ -1,7 +1,7 @@
 <?php
 /**
- *  Details     :  Database
- *  Author(s)   :  Matt langlois
+ *  Details     :  Database Singleton used to connect an retrieve a connection to the database using PDO
+ *  Author(s)   :  Matt Langlois
  *
  */
 

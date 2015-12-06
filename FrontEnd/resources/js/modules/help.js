@@ -161,7 +161,7 @@ Keeper.createModule(function (Keeper) {
 
             createElement({
                 elem: 'p',
-                textContent: 'To create a tournament, simply navigate to the Tournament page from the navigation bar, then press "Create Tournament". Enter a tournament name, and choose from Round Robin, Knock-out, or Combination formats. A Knock-out style tournament requires n^2 teams, and both Combination and Round Robit require 2 or more teams. You can also being a Pre-game tournament by pressing the "Begin" button next to the tournament name.',
+                textContent: 'To create a tournament, simply navigate to the Tournament page from the navigation bar, then press "Create Tournament". Enter a tournament name, and choose from Round Robin, Knock-out, or Combination formats. A Knock-out style tournament requires 2^n teams, and both Combination and Roundrobin require 2 or more teams. You can also being a Pre-game tournament by pressing the "Begin" button next to the tournament name.',
                 putIn: ContentPane
             });
         }

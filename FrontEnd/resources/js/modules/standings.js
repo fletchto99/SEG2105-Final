@@ -205,6 +205,10 @@ Keeper.createModule(function (Keeper) {
                     key: 'Player_Name'
                 },
                 {
+                    title: 'Number',
+                    key: 'Jersey_Number'
+                },
+                {
                     title: 'Goals Scored',
                     key: 'Goals_Scored'
                 }

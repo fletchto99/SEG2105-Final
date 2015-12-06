@@ -10,6 +10,10 @@ require_once 'lib/Entity.php';
  */
 class Team extends Entity {
 
+    /**
+     * Populates the entity with the information from the database. Requires the entity's ID to be
+     * defined before the information can be populated
+     */
     private function populate() {
         if (!isset($this->Team_ID)) {
             ApplicationError('Team', 'Team_ID is not defined!');
@@ -29,6 +33,13 @@ class Team extends Entity {
         $this->data = $results;
     }
 
+    /**
+     * Populates a teams's entity with the teams's info
+     *
+     * @param int $teamID The ID of the team
+     *
+     * @return Team The populated person entity
+     */
     public static function getTeam($teamID) {
         if (!isset($teamID)) {
             ApplicationError('Team', 'teamID is not defined!');
@@ -40,6 +51,11 @@ class Team extends Entity {
         return $team;
     }
 
+    /**
+     * Creates a team and sets the captain id, unless otherwise specified
+     *
+     * @return Team The team which was created
+     */
     public function create() {
         $user = Person::user();
 
@@ -58,7 +74,6 @@ class Team extends Entity {
         }
 
         if (!isset($user->Jersey_Number) || !is_numeric($user->Jersey_Number)) {
-            var_dump($user);
             ApplicationError('User', 'You need a jersey number before you can create a team!');
         }
 
@@ -77,6 +92,12 @@ class Team extends Entity {
         return Team::getTeam($teamID);
     }
 
+    /**
+     * Updates the team's avatar with the avatar provided
+     *
+     * @param String $Team_Avatar The new team avatar
+     * @return Entity A success message
+     */
     public function updateAvatar($Team_Avatar) {
         $user = Person::user();
         if ($user->Person_ID != $this->Captain_ID && !$user->hasRole('Organizer')) {
@@ -91,6 +112,13 @@ class Team extends Entity {
         return new Entity(['success'=>"Team avatar updated to {$this->Team_Avatar}"]);
     }
 
+    /**
+     * Updates the team's name with the name provided
+     *
+     * @param String $Team_Name The new team name
+     *
+     * @return Entity A success message
+     */
     public function updateName($Team_Name) {
         $user = Person::user();
         if ($user->Person_ID != $this->Captain_ID && !$user->hasRole('Organizer')) {
@@ -106,6 +134,13 @@ class Team extends Entity {
         return new Entity(['success'=>"Team name updated to {$this->Team_Name}"]);
     }
 
+    /**
+     * Fetches all of the tournaments the team is in
+     *
+     * @param int|null $status The status of the tournament
+     *
+     * @return array An array of all of the tournaments for the specific team
+     */
     public function getTournaments($status = null) {
         $dbh = Database::getInstance();
         $sql = "SELECT t.Tournament_ID
@@ -126,6 +161,11 @@ class Team extends Entity {
         }
     }
 
+    /**
+     * Fetches all of the matches the team has won
+     *
+     * @return int A count of all of the matches won
+     */
     public function matchesWon() {
         $dbh = Database::getInstance();
         $sql = "SELECT COUNT(*) as count
@@ -137,6 +177,11 @@ class Team extends Entity {
         return $results['count'];
     }
 
+    /**
+     * Fetches all of the matches the team has lost
+     *
+     * @return int A count of all of the matches won
+     */
     public function matchesLost() {
         $dbh = Database::getInstance();
         $sql = "SELECT COUNT(*) as count
@@ -150,6 +195,11 @@ class Team extends Entity {
         return $results['count'];
     }
 
+    /**
+     * Fetches all of the players on the team, along with their information
+     *
+     * @return Entity An entity containing all of hte players on the team
+     */
     public function getPlayers() {
         $players = new Entity(['Team_ID'=>$this->Team_ID]);
         $dbh = Database::getInstance();
@@ -164,15 +214,22 @@ class Team extends Entity {
         return $players;
     }
 
+    /**
+     * Retrieves the players standings
+     *
+     * @param Tournament|null $tournament The tournament to limit the standings to
+     *
+     * @return Entity An entity containing all of the teams standings
+     */
     public function getRankings($tournament = null) {
         $results = new Entity();
         $results->addToData(['Team_ID'=>$this->Team_ID]);
         $dbh = Database::getInstance();
 
         if (isset($tournament)) {
-            $sql = "SELECT Player_ID, max(Goals_Scored) as Goals_Scored, First_Name, Last_Name
+            $sql = "SELECT Player_ID, max(Goals_Scored) as Goals_Scored, First_Name, Last_Name, Jersey_Number
                     FROM (
-                        SELECT g.Player_ID, count(*) as Goals_Scored, p.First_Name, p.Last_Name
+                        SELECT g.Player_ID, count(*) as Goals_Scored, p.First_Name, p.Last_Name, p.Jersey_Number
                         FROM Goals g
                             INNER JOIN Persons p on p.Person_ID = g.Player_ID
                             INNER JOIN Matches m on g.Match_ID = m.Match_ID
@@ -183,7 +240,7 @@ class Team extends Entity {
                         GROUP BY g.Player_ID
                         HAVING count(*) > 0
                         UNION
-                        SELECT Person_ID as Player_ID, 0 as Goals_Scored, First_Name, Last_Name
+                        SELECT Person_ID as Player_ID, 0 as Goals_Scored, First_Name, Last_Name, Jersey_Number
                         FROM Persons
                         WHERE Team_ID = ?
                             AND Person_ID IS NOT NULL
@@ -193,9 +250,9 @@ class Team extends Entity {
             $sth->execute([$this->Team_ID, $tournament->Tournament_ID, $this->Team_ID]);
             $results->addToData(['standings'=>$sth->fetchAll()]);
         } else {
-            $sql = "SELECT Player_ID, max(Goals_Scored) as Goals_Scored, First_Name, Last_Name
+            $sql = "SELECT Player_ID, max(Goals_Scored) as Goals_Scored, First_Name, Last_Name, Jersey_Number
                     FROM (
-                        SELECT g.Player_ID, count(*) as Goals_Scored, p.First_Name, p.Last_Name
+                        SELECT g.Player_ID, count(*) as Goals_Scored, p.First_Name, p.Last_Name, p.Jersey_Number
                         FROM Goals g
                             INNER JOIN Persons p on p.Person_ID = g.Player_ID
                         WHERE g.Team_ID = ?
@@ -203,7 +260,7 @@ class Team extends Entity {
                         GROUP BY g.Player_ID
                         HAVING count(*) > 0
                         UNION
-                        SELECT Person_ID as Player_ID, 0 as Goals_Scored, First_Name, Last_Name
+                        SELECT Person_ID as Player_ID, 0 as Goals_Scored, First_Name, Last_Name, Jersey_Number
                         FROM Persons
                         WHERE Team_ID = ?
                             AND Person_ID IS NOT NULL
@@ -216,6 +273,13 @@ class Team extends Entity {
         return $results;
     }
 
+    /**
+     * Checks if a jersey number is available on the team
+     *
+     * @param int $number The number to check
+     *
+     * @return bool True if the number is available; otherwise false
+     */
     public function checkAvailableJerseyNumber($number) {
         $players = $this->getPlayers();
         $playersIter = $players->each()['Players'];
@@ -227,6 +291,11 @@ class Team extends Entity {
         return true;
     }
 
+    /**
+     * Fetches all of the teams in the system
+     *
+     * @return Entity An entity containing all of the teams
+     */
     public static function getTeams() {
         $dbh = Database::getInstance();
         $result = new Entity();
@@ -240,6 +309,13 @@ class Team extends Entity {
         return $result;
     }
 
+    /**
+     * Fetches all of the teams not in a specific tournament
+     *
+     * @param Tournament $tournament The tournament to check
+     *
+     * @return Entity An entity containing all of the teams not in the tournament
+     */
     public static function getTeamsNotInTournament($tournament) {
         $dbh = Database::getInstance();
         $result = new Entity();

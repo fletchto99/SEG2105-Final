@@ -1,6 +1,6 @@
 <?php
 /**
- * Validates login using basic authentication
+ * Validates login using HTTP basic authentication
  */
 
 require_once __DIR__ . '/../bootstrap.php';
