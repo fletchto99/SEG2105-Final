@@ -108,13 +108,13 @@ Keeper.createModule(function (Keeper) {
                             Module.beginTournament(row);
                         }
                     });
-                } else if (Keeper.hasRole('Player')) {//&& Keeper.user.Team != null && Keeper.user.Team.Captain_ID == Keeper.user.Person_ID
+                } else if (Keeper.hasRole('Player') && Keeper.user.Team != null && Keeper.user.Team.Captain_ID == Keeper.user.Person_ID) {
                     pregameButtons.push({
                         title: 'Join Tournament',
                         text: 'Join',
                         style: 'success',
                         onclick: function (row) {
-                            Keeper.showAlert('Not yet implemented :( sorry', 'warning');
+                            Module.joinTournament(row);
                         }
                     });
                 }
@@ -392,6 +392,18 @@ Keeper.createModule(function (Keeper) {
         }).fail(function (data) {
             Keeper.showAlert(data.message, 'danger');
         });
+    };
+
+    Module.joinTournament = function(tournament) {
+        Keeper.data.update('add-team-to-tournament', {
+            Tournament_ID: tournament.Tournament_ID,
+            Team_ID: Keeper.user.Team_ID
+        }).done(function () {
+            Keeper.showAlert('Team has been added to ' + tournament.Tournament_Name + '!', 'success', 5000);
+            Keeper.reloadModule();
+        }).fail(function (data) {
+            Keeper.showAlert(data.message, 'danger');
+        })
     };
 
     Module.getTournamentTypeString = function(tt) {

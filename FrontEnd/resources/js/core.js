@@ -50,7 +50,9 @@
                 Keeper.showAlert('Welcome to Tournament Maker ' + Keeper.user.First_Name, 'info', 10000);
             };
             if (Keeper.user.Team_ID != null) {
-                Keeper.data.get('team').done(function(data) {
+                Keeper.data.get('team', {
+                    Team_ID: Keeper.user.Team_ID
+                }).done(function(data) {
                     Keeper.user.Team = data;
                     start();
                 }).fail(function(data) {

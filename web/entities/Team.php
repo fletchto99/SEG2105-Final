@@ -74,7 +74,7 @@ class Team extends Entity {
         $teamID = $dbh->lastInsertId();
         $user->joinTeam(self::getTeam($teamID));
 
-        return new Entity(['success'=>'Team successfully created!']);
+        return Team::getTeam($teamID);
     }
 
     public function updateAvatar($Team_Avatar) {
@@ -170,21 +170,6 @@ class Team extends Entity {
         $dbh = Database::getInstance();
 
         if (isset($tournament)) {
-            $sql = "SELECT g.Player_ID, count(*) as Goals_Scored, p.First_Name, p.Last_Name
-                    FROM Goals g
-                        INNER JOIN Matches m on g.Match_ID = m.Match_ID
-                        INNER JOIN Tournaments t on t.Tournament_ID = m.Tournament_ID
-                        INNER JOIN Persons p on p.Person_ID = g.Player_ID
-                    WHERE g.Team_ID = ?
-                        AND g.Player_ID IS NOT NULL
-                        AND t.Tournament_ID = ?
-                    GROUP BY g.Player_ID
-                    HAVING count(*) > 0
-                    UNION
-                    SELECT Person_ID as Player_ID, 0 as Goals_Scored, First_Name, Last_Name
-                    FROM Persons
-                    WHERE Team_ID = ?";
-
             $sql = "SELECT Player_ID, max(Goals_Scored) as Goals_Scored, First_Name, Last_Name
                     FROM (
                         SELECT g.Player_ID, count(*) as Goals_Scored, p.First_Name, p.Last_Name
@@ -202,7 +187,8 @@ class Team extends Entity {
                         FROM Persons
                         WHERE Team_ID = ?
                             AND Person_ID IS NOT NULL
-                    ) as Results";
+                    ) as Results
+                    GROUP BY Player_ID";
             $sth = $dbh->prepare($sql);
             $sth->execute([$this->Team_ID, $tournament->Tournament_ID, $this->Team_ID]);
             $results->addToData(['standings'=>$sth->fetchAll()]);
@@ -221,7 +207,8 @@ class Team extends Entity {
                         FROM Persons
                         WHERE Team_ID = ?
                             AND Person_ID IS NOT NULL
-                    ) as Results";
+                    ) as Results
+                    GROUP BY Player_ID";
             $sth = $dbh->prepare($sql);
             $sth->execute([$this->Team_ID, $this->Team_ID]);
             $results->addToData(['standings' => $sth->fetchAll()]);

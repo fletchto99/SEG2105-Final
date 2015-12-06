@@ -152,16 +152,6 @@ Keeper.createModule(function (Keeper) {
                     key: 'Team_B_Name'
                 }
             ],
-            buttons: [
-                {
-                    title: 'Match Details',
-                    text: 'Details',
-                    style: 'primary',
-                    onclick: function (row) {
-                        Keeper.showAlert('Implement this!!', 'danger');
-                    }
-                }
-            ],
             putIn: container
         });
     };

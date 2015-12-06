@@ -43,7 +43,6 @@ Keeper.createModule(function (Keeper) {
         }
 
         if (parameters[0]) {
-            console.log(parameters);
             Keeper.data.get('tournament', {
                 Tournament_ID: parameters[0]
             }).done(function (data) {
@@ -80,7 +79,9 @@ Keeper.createModule(function (Keeper) {
                     },
                     putIn: ContentPane
                 });
+            }
 
+            if (Keeper.hasRole('Organizer') || (Keeper.hasRole('Player') && Keeper.user.Team == null)) {
                 createElement({
                     elem: 'button',
                     className: 'btn-inline btn btn-primary',
@@ -125,7 +126,7 @@ Keeper.createModule(function (Keeper) {
                 text: 'Join Team',
                 style: 'success',
                 onclick: function (row) {
-                    Keeper.showAlert('Implement this!!', 'danger');
+                    Module.joinTeam(row);
                 }
             });
         } else if (Keeper.hasRole('Organizer') && tournament == undefined) {
@@ -134,7 +135,7 @@ Keeper.createModule(function (Keeper) {
                 text: 'Add Player',
                 style: 'success',
                 onclick: function (row) {
-                    Keeper.showAlert('Implement this!!', 'danger');
+                    Module.addToTeam(row);
                 }
             });
         }
@@ -156,32 +157,117 @@ Keeper.createModule(function (Keeper) {
     };
 
     Module.createTeam = function () {
+        if (Keeper.hasRole('Organizer')) {
+            Keeper.data.get('manual-players', {
+                No_Team_Assigned: true
+            }).done(function (data) {
+                if (data.Players.length > 0) {
+                    var teamNameInput = createElement({
+                        elem: 'input',
+                        type: 'text',
+                        className: 'form-control',
+                        attributes: {
+                            placeHolder: 'Team Name',
+                            required: '',
+                            autofocus: ''
+                        }
+                    });
+
+                    var playerOptions = [createElement({
+                        elem: 'option',
+                        disabled: true,
+                        selected: true,
+                        value: -1,
+                        textContent: 'Select team captain'
+                    })];
+
+
+                    data.Players.forEach(function (player) {
+                        playerOptions.push(createElement({
+                            elem: 'option',
+                            value: player.Person_ID,
+                            textContent: player.First_Name + " " + player.Last_Name
+                        }));
+                    });
+
+                    var playerSelect = createElement({
+                        elem: 'select',
+                        className: 'form-control',
+                        inside: playerOptions
+                    });
+                    Keeper.showModal('Create Team', createElement({
+                        elem: 'div',
+                        inside: [
+                            teamNameInput,
+                            playerSelect
+                        ]
+                    }), 'Create', function () {
+                        if (playerSelect.value > -1) {
+                            Keeper.data.update('create-team', {
+                                Team_Name: teamNameInput.value,
+                                Captain_ID: playerSelect.value
+                            }).done(function (data) {
+                                Keeper.reloadModule(Keeper.current_params);
+                                Keeper.showAlert('Team created!', 'success')
+                            }).fail(function (data) {
+                                Keeper.showAlert(data.message, 'danger')
+                            });
+                        } else {
+                            Keeper.showAlert('Please select a team captain!', 'warning');
+                        }
+                    })
+                } else {
+                    Keeper.showAlert('There are no free players to be the team captain! Please create a player first!', 'warning');
+                }
+            }).fail(function (data) {
+                Keeper.showAlert(data.message, 'danger');
+            });
+        } else {
+            var teamNameInput = createElement({
+                elem: 'input',
+                type: 'text',
+                className: 'form-control',
+                attributes: {
+                    placeHolder: 'Team Name',
+                    required: '',
+                    autofocus: ''
+                }
+            });
+            Keeper.showModal('Create Team', createElement({
+                elem: 'div',
+                inside: [
+                    teamNameInput
+                ]
+            }), 'Create', function () {
+                Keeper.data.update('create-team', {
+                    Team_Name: teamNameInput.value
+                }).done(function (data) {
+                    Keeper.user.Team = data;
+                    Keeper.reloadModule(Keeper.current_params);
+                    Keeper.showAlert('Team created!', 'success')
+                }).fail(function (data) {
+                    Keeper.showAlert(data.message, 'danger')
+                });
+            })
+        }
+    };
+
+    Module.addToTeam = function (team) {
         Keeper.data.get('manual-players', {
             No_Team_Assigned: true
         }).done(function (data) {
             if (data.Players.length > 0) {
-                var teamNameInput = createElement({
-                    elem: 'input',
-                    type: 'text',
-                    className: 'form-control',
-                    attributes: {
-                        placeHolder: 'Team Name',
-                        required: '',
-                        autofocus: ''
-                    }
-                });
 
                 var playerOptions = [createElement({
                     elem: 'option',
                     disabled: true,
                     selected: true,
                     value: -1,
-                    textContent: 'Select team captain'
+                    textContent: 'Select player...'
                 })];
 
 
-
-                data.Players.forEach(function(player) {
+                data.Players.forEach(function (player) {
                     playerOptions.push(createElement({
                         elem: 'option',
                         value: player.Person_ID,
@@ -194,34 +280,45 @@ Keeper.createModule(function (Keeper) {
                     className: 'form-control',
                     inside: playerOptions
                 });
-                Keeper.showModal('Create Player', createElement({
+                Keeper.showModal('Add Player to ' + team.Team_Name, createElement({
                     elem: 'div',
                     inside: [
-                        teamNameInput,
                         playerSelect
                     ]
-                }), 'Create', function () {
+                }), 'Add', function () {
                     if (playerSelect.value > -1) {
-                        Keeper.data.update('create-team', {
-                            Team_Name: teamNameInput.value,
-                            Captain_ID: playerSelect.value,
+                        Keeper.data.update('add-player-to-team', {
+                            Team_ID: team.Team_ID,
+                            Player_ID: playerSelect.value
                         }).done(function (data) {
                             Keeper.reloadModule(Keeper.current_params);
-                            Keeper.showAlert('Team created!', 'success')
+                            Keeper.showAlert('Player added!', 'success')
                         }).fail(function (data) {
                             Keeper.showAlert(data.message, 'danger')
                         });
                     } else {
-                        Keeper.showAlert('Please select a team captain!', 'warning');
+                        Keeper.showAlert('Please select a player', 'warning');
                     }
                 })
             } else {
-                Keeper.showAlert('There are no free players to be the team captain! Please create a player first!', 'warning');
+                Keeper.showAlert('There are no free players! Please create a player first!', 'warning');
             }
         }).fail(function (data) {
             Keeper.showAlert(data.message, 'danger');
         });
 
+    };
+
+    Module.joinTeam = function(team) {
+        Keeper.data.update('add-player-to-team', {
+            Team_ID: team.Team_ID
+        }).done(function (data) {
+            Keeper.user.Team = team;
+            Keeper.reloadModule(Keeper.current_params);
+            Keeper.showAlert('Successfully joined ' + team.Team_Name, 'success')
+        }).fail(function (data) {
+            Keeper.showAlert(data.message, 'danger')
+        });
     };
 
     Module.createPlayer = function () {

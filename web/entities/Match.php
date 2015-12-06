@@ -169,7 +169,8 @@ class Match extends Entity {
             $sql = "SELECT COUNT(*) as count
                     FROM Matches
                     WHERE Tournament_ID=?
-                        AND Round=null";
+                        AND Round IS NULL
+                        AND Status <> 2";
             $sth = $dbh->prepare($sql);
             $sth->execute([$tournament->Tournament_ID]);
             $results = $sth->fetch();

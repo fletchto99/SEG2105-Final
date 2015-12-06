@@ -352,4 +352,24 @@ class Person extends Entity {
         return new Entity(['Success'=>"Player avatar changed to {$Person_Avatar}"]);
     }
 
+    public function setAsOrganizer($person) {
+        $user = Person::user();
+        if ($user->Role_Name != 'Organizer') {
+            ApplicationError("Permissions","Only organizers can set other's roles to organizer","403");
+        }
+        if ($person-> Team_ID != null) {
+            ApplicationError("Organizer", "To set someone as an organizer, the must first leave their team!");
+        }
+
+        $sql = "UPDATE Persons
+                SET Role_ID=1,
+                    Jersey_Number=NULL
+                WHERE Person_ID=?";
+        $dbh = Database::getInstance();
+        $sth = $dbh->prepare($sql);
+        $sth->execute([$person->Person_ID]);
+
+        return new Entity(['Success' => "Player now an organizer!"]);
+    }
+
 }
