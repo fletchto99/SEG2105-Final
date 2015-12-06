@@ -2,7 +2,7 @@
  *  Author(s)           :  Matt Langlois
  *  File Created        :  December 2015
  *  Application Path    :  /#help
- *  Details             :  Module to logout
+ *  Details             :  Module to display the help file
  */
 
 Keeper.createModule(function (Keeper) {
@@ -17,7 +17,7 @@ Keeper.createModule(function (Keeper) {
     var Module = {
         id: 'hep', // Appears in address bar. Used in Links.
         title: 'Help', // Used in title
-        visible_in_nav_bar: true,
+        visible_in_nav_bar: Keeper.user.Person_ID > 0,
         navbar_visible: true,
         css: 'help.css'
     };

@@ -2,7 +2,7 @@
  *  Author(s)           :  Matt Langlois
  *  File Created        :  December 2015
  *  Application Path    :  /#standings
- *  Details             :  Module to display tournament standings
+ *  Details             :  Module to display standings
  */
 
 Keeper.createModule(function (Keeper) {

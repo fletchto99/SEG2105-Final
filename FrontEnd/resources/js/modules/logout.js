@@ -17,7 +17,7 @@ Keeper.createModule(function (Keeper) {
     var Module = {
         id: 'logout', // Appears in address bar. Used in Links.
         title: 'Logout', // Used in title
-        visible_in_nav_bar: true,
+        visible_in_nav_bar: Keeper.user.Person_ID > 0,
         navbar_visible: true,
         css: 'logout.css'
     };
@@ -26,7 +26,7 @@ Keeper.createModule(function (Keeper) {
      * Called when the module is removed
      */
     Module.unload = function () {
-
+        Keeper.showAlert('Successfully logged out.', 'success', 10000);
     };
 
     /**
@@ -38,10 +38,8 @@ Keeper.createModule(function (Keeper) {
      */
     Module.display = function (ContentPane, parameters) {
         Keeper.data.logout().done(function () {
-            Keeper.showAlert('Successfully logged out.', 'success', 10000);
             Keeper.loadModule('welcome');
         }).fail(function (error) {
-            console.log(error);
             Keeper.loadModule('welcome');
         });
         return true;

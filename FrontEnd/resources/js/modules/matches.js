@@ -2,7 +2,7 @@
  *  Author(s)           :  Matt Langlois
  *  File Created        :  December 2015
  *  Application Path    :  /#matches
- *  Details             :  Module to display matchinfo
+ *  Details             :  Module to display match info
  */
 
 Keeper.createModule(function (Keeper) {

@@ -8,16 +8,6 @@
 (function () {
     'use strict';
 
-    /**
-     * Injects an array object into an array of objects
-     *
-     * @param idx The index to inject into the parent array
-     * @param {Array} arr The array to inject
-     */
-    Array.prototype.injectArray = function (idx, arr) {
-        this.splice.apply(this, [idx, 0].concat(arr));
-    };
-
 
     /**
      * Helper function acting as a shortcut for document.createElement()

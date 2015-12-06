@@ -75,15 +75,12 @@ $(function () {
         return Keeper.data.request(url, parameters);
     };
 
-    // Queue updates and deletes to prevent strange race conditions
-    var _requestQueue = [];
-
     /**
      * Calls an update controller
      *
      * @param {String} entity_name The controller's name
      * @param {String} parameters The parameters to pass to the controller
-     * @returns {{go: Function, done: Function}} Called once the controller returns some information
+     * @returns {Deferred} Called once the controller returns some information
      */
     Keeper.data.update = function (entity_name, parameters) {
         if (!parameters) {
@@ -99,7 +96,7 @@ $(function () {
      *
      * @param {String} entity_name The controller's name
      * @param {String} parameters The parameters to pass to the controller
-     * @returns {{go: Function, done: Function}} Called upon successful removal
+     * @returns {Deferred} Called once the controller returns some information
      */
     Keeper.data.remove = function (entity_name, parameters) {
         if (!parameters) {
@@ -113,7 +110,7 @@ $(function () {
     /**
      * Authenticates the user with the server and generates their session
      *
-     * @returns {{done: Function}} Called once the user has been successfully authenticated with the system
+     * @returns {Deferred} Called once the controller returns some information
      */
     Keeper.data.login = function (username, password) {
         var headers = [{
@@ -123,10 +120,20 @@ $(function () {
         return Keeper.data.request('../backend/controllers/validate-session.php', {}, headers);
     };
 
+    /**
+     * Determines if the user is authenticated with the server, and returns their session if they are
+     *
+     * @returns {Deferred} Called once the controller returns some information (authenticated/error)
+     */
     Keeper.data.isAuthenticated = function () {
         return Keeper.data.request('../backend/controllers/validate-session.php');
     };
 
+    /**
+     * Clears the user's session with the server
+     *
+     * @returns {Deferred} Called once the controller returns some information
+     */
     Keeper.data.logout = function () {
         return Keeper.data.request('../backend/controllers/logout.php');
     }

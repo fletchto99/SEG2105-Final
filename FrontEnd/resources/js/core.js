@@ -1,5 +1,5 @@
 /**
- *  Author(s)           :  Will Thompson, Kurt Bruneau, Matt Langlois
+ *  Author(s)           :  Matt Langlois Kurt Bruneau
  *  File Created        :  May 2014
  *  File Updated        :  December 2015
  *  Details             :  This file contains all the top level functions for the Keeper library
@@ -19,6 +19,7 @@
     Keeper.Modules = [];
     Keeper.ModuleMap = {};
 
+    //Some global variables
     Keeper.CurrentModule = null;
     Keeper.user = null;
 
@@ -38,17 +39,22 @@
 
     /**
      * Initializes Keeper
-     *
      */
     Keeper.init = function () {
-        $(document.getElementById('NavigationBar')).hide();
+
+        Keeper.hideNavBar();
+
+        //check if a session is already in progress, if so resume it
         Keeper.data.isAuthenticated().done(function (data) {
             Keeper.user = data;
 
+            //Process our page and welcome the user
             var start = function() {
                 Keeper.processHashChange();
                 Keeper.showAlert('Welcome to Tournament Maker ' + Keeper.user.First_Name, 'info', 10000);
             };
+
+            //Check if
             if (Keeper.user.Team_ID != null) {
                 Keeper.data.get('team', {
                     Team_ID: Keeper.user.Team_ID
@@ -75,8 +81,10 @@
             Keeper.loadModule('welcome');
         });
 
+        //Listen for hash changes to determine page changes, maintaining state without reloading a page
         window.addEventListener('hashchange', Keeper.processHashChange);
 
+        //Listen for error events and pass them to our notification system
         window.addEventListener('error', function (e) {
             Keeper.showAlert(e.message, 'danger');
         });
@@ -129,7 +137,7 @@
         var module = null;
 
         if (!module_id || module_id === '') {
-            module = Keeper.ModuleMap[0];
+            module = Keeper.ModuleMap[0]; //error loading module, load the first one in our module map
         } else if (module_id instanceof Object) {
             module = module_id;
         } else {
@@ -168,17 +176,17 @@
      *
      * @param {String} module The ID of the module to be loaded
      * @param {Array} parameters The parameters after the url required by the module
-     * @param {boolean} pushState The state to push the module in, determines if the module should be added to the history
      * @returns {boolean} True if the module was loaded successfully; otherwise false
      */
-    Keeper.loadModule = function (module, parameters, pushState) {
+    Keeper.loadModule = function (module, parameters) {
         module = Keeper.Module(module);
         if (module === undefined) {
             module = Keeper.ModuleMap[Object.keys(Keeper.ModuleMap)[0]];
         }
-        // Handle case where module doesn't exist
+        // Handle case where module doesn't exist, this should never happpen unless all modules fail to load
         if (!module) {
-            console.log("Could not locate, displaying 404 overlay.");
+            console.log("Could not locate!");
+            Keeper.showAlert('404 Could not locate the page you were looking for! Sorry!', 'danger');
             return false;
         }
 
@@ -190,10 +198,7 @@
         var modulePath = module.id + '/' + parameters.map(encodeURIComponent).join('/');
 
         if (Keeper.CurrentModule !== module) {
-            // Add a new state to history if not explicitly disabled
-            if (pushState !== false) {
-                history.pushState({}, '', '#' + modulePath);
-            }
+            history.pushState({}, '', '#' + modulePath);
 
             console.log('Loading module ' + modulePath);
         } else {
@@ -225,8 +230,10 @@
             className: 'container'
         });
 
+        //Update the page content
         OldContentPane.parentElement.replaceChild(ContentPane, OldContentPane);
 
+        //Update our current module global variables
         Keeper.CurrentModule = module;
         Keeper.current_params = parameters;
 
@@ -242,6 +249,7 @@
             // Change the title of the page
             document.title = module.title;
 
+            //Determine if the navbar should be visible
             if (module.navbar_visible) {
                 Keeper.showNavBar();
             } else if (!module.navbar_visible) {
@@ -298,6 +306,7 @@
             }
         }
 
+        //remove any old CSS
         if (oldCSS && oldCSS.parentElement) {
             oldCSS.parentElement.removeChild(oldCSS);
         }
@@ -353,16 +362,14 @@
     };
 
     /**
-     * Shrinks the sidebar horizontally effectively "Hiding" it from the user. A new
-     * view of the side bar is rendered and a full view of the sidebar becomes accessible
-     * by moving the mouse cursor over the hidden sidebar
+     * Hides the navbar from view
      */
     Keeper.hideNavBar = function () {
         $(document.getElementById("NavigationBar")).fadeOut();
     };
 
     /**
-     * Re-enables the full view of the sidebar after the side bar has been hidden
+     * Re-enables the visibility of the navbar
      */
     Keeper.showNavBar = function () {
         $(document.getElementById("NavigationBar")).fadeIn();

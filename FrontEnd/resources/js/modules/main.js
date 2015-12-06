@@ -2,7 +2,7 @@
  *  Author(s)           :  Matt Langlois
  *  File Created        :  December 2015
  *  Application Path    :  /#main
- *  Details             :  Module to display welcome screen
+ *  Details             :  Module to display main logged in welcome page
  */
 
 Keeper.createModule(function (Keeper) {
