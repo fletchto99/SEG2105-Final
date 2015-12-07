@@ -28,5 +28,4 @@ proguard/
 
 # Log Files
 *.log
-web/configuration.php
 web/cgi-bin/configuration.php
