@@ -15,6 +15,8 @@
         window.Keeper = {};
     }
 
+    Keeper.ROOT_URL = 'cgi-bin/controllers/';
+
     // Set some default variables
     Keeper.Modules = [];
     Keeper.ModuleMap = {};

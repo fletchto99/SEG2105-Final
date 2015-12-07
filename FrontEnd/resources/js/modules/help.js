@@ -17,7 +17,7 @@ Keeper.createModule(function (Keeper) {
     var Module = {
         id: 'hep', // Appears in address bar. Used in Links.
         title: 'Help', // Used in title
-        visible_in_nav_bar: Keeper.user.Person_ID > 0,
+        visible_in_nav_bar: true,
         navbar_visible: true,
         css: 'help.css'
     };

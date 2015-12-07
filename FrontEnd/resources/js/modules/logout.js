@@ -17,7 +17,7 @@ Keeper.createModule(function (Keeper) {
     var Module = {
         id: 'logout', // Appears in address bar. Used in Links.
         title: 'Logout', // Used in title
-        visible_in_nav_bar: Keeper.user.Person_ID > 0,
+        visible_in_nav_bar: true,
         navbar_visible: true,
         css: 'logout.css'
     };

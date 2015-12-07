@@ -71,7 +71,7 @@ $(function () {
             parameters = {};
         }
 
-        var url = ['../backend/controllers/get/', entity_name, '.php'].join('');
+        var url = [Keeper.ROOT_URL, 'get/', entity_name, '.php'].join('');
         return Keeper.data.request(url, parameters);
     };
 
@@ -87,7 +87,7 @@ $(function () {
             parameters = {};
         }
 
-        var url = ['../backend/controllers/update/', entity_name, '.php'].join('');
+        var url = [Keeper.ROOT_URL, 'update/', entity_name, '.php'].join('');
         return Keeper.data.request(url, parameters);
     };
 
@@ -103,7 +103,7 @@ $(function () {
             parameters = {};
         }
 
-        var url = ['../backend/controllers/remove/', entity_name, '.php'].join('');
+        var url = [Keeper.ROOT_URL, 'remove/', entity_name, '.php'].join('');
         return Keeper.data.request(url, parameters);
     };
 
@@ -117,7 +117,7 @@ $(function () {
             type: 'Authorization',
             value: "Basic " + btoa(username + ":" + password)
         }];
-        return Keeper.data.request('../backend/controllers/validate-session.php', {}, headers);
+        return Keeper.data.request(Keeper.ROOT_URL + '/validate-session.php', {}, headers);
     };
 
     /**
@@ -126,7 +126,7 @@ $(function () {
      * @returns {Deferred} Called once the controller returns some information (authenticated/error)
      */
     Keeper.data.isAuthenticated = function () {
-        return Keeper.data.request('../backend/controllers/validate-session.php');
+        return Keeper.data.request(Keeper.ROOT_URL + '/validate-session.php');
     };
 
     /**
@@ -135,7 +135,7 @@ $(function () {
      * @returns {Deferred} Called once the controller returns some information
      */
     Keeper.data.logout = function () {
-        return Keeper.data.request('../backend/controllers/logout.php');
+        return Keeper.data.request(Keeper.ROOT_URL + '/logout.php');
     }
 
 });
