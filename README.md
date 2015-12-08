@@ -55,6 +55,9 @@ The setup process is fairly straight forward. It consists of 3 parts: setting up
 3. Find the account created in the `Persons` table and set their `Role_ID` to 1.
 4. Login and you will now have organizer status, being able to create players, teams and tournaments.
 
+#### Android App Configuration:
+1. Update the Strings.xml file to point to the base url of the app which was created in the JS Configuration section.
+
 ## Known Issues/Caveats of Algorithms
 
 * No way to create an organizer account with out DB access. Was initially created as a security measure but should be implemented so organizers can create other organizers.

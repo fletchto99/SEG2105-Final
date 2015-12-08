@@ -1,0 +1,1 @@
+Keeper was the original project. The team decided that it would be easier to just have a web version so it was scrapped an replaced with KeeperWeb.
