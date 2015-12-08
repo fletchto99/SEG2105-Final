@@ -44,8 +44,6 @@
      */
     Keeper.init = function () {
 
-        Keeper.hideNavBar();
-
         //check if a session is already in progress, if so resume it
         Keeper.data.isAuthenticated().done(function (data) {
             Keeper.user = data;
@@ -251,12 +249,7 @@
             // Change the title of the page
             document.title = module.title;
 
-            //Determine if the navbar should be visible
-            if (module.navbar_visible) {
-                Keeper.showNavBar();
-            } else if (!module.navbar_visible) {
-                Keeper.hideNavBar();
-            }
+
 
             var loaded_ok;
             try {
@@ -275,7 +268,13 @@
                 } else {
                     Keeper.loadModule('main');
                 }
-
+            } else {
+                //Determine if the navbar should be visible
+                if (module.navbar_visible) {
+                    Keeper.showNavBar();
+                } else if (!module.navbar_visible) {
+                    Keeper.hideNavBar();
+                }
             }
         };
 
