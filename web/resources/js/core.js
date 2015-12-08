@@ -1,5 +1,5 @@
 /**
- *  Author(s)           :  Matt Langlois Kurt Bruneau
+ *  Author(s)           :  Matt Langlois, Kurt Bruneau
  *  File Created        :  May 2014
  *  File Updated        :  December 2015
  *  Details             :  This file contains all the top level functions for the Keeper library

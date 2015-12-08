@@ -9,17 +9,13 @@ Keeper.createModule(function (Keeper) {
     'use strict';
 
     /**
-     * The properties of the admin activity sub-module
-     *
-     * @type {{id: string, name: string, title: string, icon: string, css: string, alt_key_shortcut: string,
-     *     visible_in_nav_bar, show_in_nav_bar: string, update_interval: number}}
+     * The properties of the teams module
      */
     var Module = {
         id: 'teams', // Appears in address bar. Used in Links.
         title: 'Teams', // Used in title
         visible_in_nav_bar: true,
-        navbar_visible: true,
-        css: 'main.css'
+        navbar_visible: true
     };
 
     /**

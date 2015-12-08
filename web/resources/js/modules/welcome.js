@@ -9,17 +9,13 @@ Keeper.createModule(function (Keeper) {
     'use strict';
 
     /**
-     * The properties of the admin activity sub-module
-     *
-     * @type {{id: string, name: string, title: string, icon: string, css: string, alt_key_shortcut: string,
-     *     visible_in_nav_bar, show_in_nav_bar: string, update_interval: number}}
+     * The properties of the welcome module
      */
     var Module = {
         id: 'welcome', // Appears in address bar. Used in Links.
         title: 'Welcome', // Used in title
         visible_in_nav_bar: false,
-        navbar_visible: false,
-        css: 'welcome.css'
+        navbar_visible: false
     };
 
     /**
